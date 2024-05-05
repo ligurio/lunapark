@@ -21,6 +21,7 @@ option(ENABLE_BUILD_PROTOBUF "Enable building Protobuf library" ON)
 option(ENABLE_BONUS_TESTS "Enable bonus tests" OFF)
 option(ENABLE_INTERNAL_TESTS "Enable internal tests" OFF)
 option(ENABLE_LAPI_TESTS "Enable Lua API tests" OFF)
+option(ENABLE_CBMC_PROOFS "Enable CBMC proofs" OFF)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 set(CMAKE_INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_INCLUDE_PATH})
@@ -41,6 +42,13 @@ endif()
 
 if (USE_LUAJIT AND NOT LUA_VERSION)
   set(LUA_VERSION "v2.1")
+endif()
+
+if(ENABLE_CBMC_PROOFS)
+  # The latest PUC Rio Lua version checked by CBMC.
+  if (USE_LUA)
+    set(LUA_VERSION "a5522f06d2679b8f18534fd6a9968f7eb539dc31")
+  endif()
 endif()
 
 if (USE_LUA)
@@ -73,6 +81,13 @@ if (ENABLE_LUAJIT_RANDOM_RA AND NOT IS_LUAJIT)
   message(FATAL_ERROR "Option ENABLE_LUAJIT_RANDOM_RA is LuaJIT-specific.")
 endif()
 
+enable_testing()
+
+if(ENABLE_CBMC_PROOFS)
+  add_subdirectory(proofs/cbmc)
+  return()
+endif()
+
 if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
    NOT CMAKE_C_COMPILER_ID STREQUAL "Clang")
   message(FATAL_ERROR
@@ -94,8 +109,6 @@ SetBuildParallelLevel(CMAKE_BUILD_PARALLEL_LEVEL)
 if(ENABLE_COV)
     include(CodeCoverage)
 endif()
-
-enable_testing()
 
 add_subdirectory(extra)
 add_subdirectory(libluamut)

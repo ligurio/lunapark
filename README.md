@@ -19,8 +19,8 @@
 
 # lunapark
 
-is a set of fuzzing tests for C implementations of Lua runtime (PUC Rio Lua and
-LuaJIT).
+is a set of fuzzing tests and CBMC proofs for C implementations
+of Lua runtimes (PUC Rio Lua and LuaJIT).
 
 <details>
 <summary>If you are interested to know why it is called Lunapark</summary>
@@ -63,6 +63,7 @@ is LuaJIT-specific.
   library is used.
 - `ENABLE_INTERNAL_TESTS` enables internal tests.
 - `ENABLE_LAPI_TESTS` enables Lua API tests.
+- `ENABLE_CBMC_PROOFS` enables building CBMC proofs instead tests.
 
 ### Running
 
