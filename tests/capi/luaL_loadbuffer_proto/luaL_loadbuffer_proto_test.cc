@@ -5,6 +5,10 @@
  * Copyright 2022, Tarantool AUTHORS.
  */
 
+#include <fstream>
+#include <iostream>
+#include <string>
+
 extern "C"
 {
 #include "lua.h"
@@ -16,6 +20,9 @@ extern "C"
 #include <signal.h>
 #include <unistd.h>
 }
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 #include "lua_grammar.pb.h"
 #include "serializer.h"
@@ -29,6 +36,8 @@ extern "C"
 	              << std::endl
 
 #define UNUSED __attribute__((unused))
+
+const char *dump_path = ::getenv("LPM_DUMP_NATIVE_INPUT");
 
 struct metrics {
 	size_t total_num;
@@ -217,8 +226,17 @@ DEFINE_PROTO_FUZZER(const lua_grammar::Block &message)
 
 	std::string code = luajit_fuzzer::MainBlockToString(message);
 
-	if (::getenv("LPM_DUMP_NATIVE_INPUT") && code.size() != 0) {
+	if (dump_path && code.size() != 0) {
 		std::cout << "-------------------------" << std::endl;
+		if (fs::exists(dump_path) && fs::is_directory(dump_path)) {
+			std::string hash = std::to_string(std::hash<std::string>{}(code));
+			std::string path = std::string(dump_path) + "/" + hash + ".lua";
+			std::ofstream out(path);
+			out << code;
+			out.close();
+			std::cout << path << std::endl;
+			return;
+		}
 		std::cout << code << std::endl;
 	}
 
