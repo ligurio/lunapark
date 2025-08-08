@@ -31,6 +31,15 @@
    https://groups.google.com/g/lua-l/c/Cfb5Yn0aJEU
    https://issues.oss-fuzz.com/issues/455148340,
    https://oss-fuzz.com/testcase-detail/5818389013790720
+1. Memory leak on execution a Lua chunk,
+   https://groups.google.com/g/lua-l/c/iknlDQ_slus
+   https://oss-fuzz.com/testcase-detail/6216394992844800
+   https://issues.oss-fuzz.com/issues/467095524
+   https://github.com/lua/lua/commit/a5522f06d2679b8f18534fd6a9968f7eb539dc31
+1. A signed integer overflow in `lua_gc`,
+   https://oss-fuzz.com/testcase-detail/6260291328606208
+   https://issues.oss-fuzz.com/issues/466669138
+   https://groups.google.com/g/lua-l/c/WWVjDfGeyvs
 
 ### LuaJIT
 
@@ -102,6 +111,10 @@
    https://github.com/LuaJIT/LuaJIT/issues/1152,
    https://issues.oss-fuzz.com/issues/394126186,
    https://github.com/tarantool/security/issues/143
+1. Missed type conversion for already existent slots in DUALNUM mode,
+   https://github.com/LuaJIT/LuaJIT/issues/1413
+1. Duality of 0 in `DUALNUM` build and `BC_UNM`,
+   https://github.com/LuaJIT/LuaJIT/issues/1422
 
 ### Tarantool
 
