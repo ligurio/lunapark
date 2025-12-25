@@ -96,7 +96,7 @@ macro(build_luajit LJ_VERSION)
     set(LUA_LIBRARY ${LJ_SOURCE_DIR}/src/libluajit.a)
     set(LUA_EXECUTABLE ${LJ_SOURCE_DIR}/src/luajit)
 
-    ExternalProject_Add(patched-luajit-${LJ_VERSION}
+    ExternalProject_Add(patched-luajit
         GIT_REPOSITORY https://github.com/LuaJIT/LuaJIT
         GIT_TAG ${LJ_VERSION}
         GIT_PROGRESS TRUE
@@ -127,7 +127,7 @@ macro(build_luajit LJ_VERSION)
     add_library(bundled-liblua STATIC IMPORTED GLOBAL)
     set_target_properties(bundled-liblua PROPERTIES
       IMPORTED_LOCATION ${LUA_LIBRARY})
-    add_dependencies(bundled-liblua patched-luajit-${LJ_VERSION})
+    add_dependencies(bundled-liblua patched-luajit)
 
     set(LUA_LIBRARIES bundled-liblua)
     set(LUA_INCLUDE_DIR ${LJ_SOURCE_DIR}/src/)

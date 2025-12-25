@@ -73,7 +73,7 @@ macro(build_lua LUA_VERSION)
     set(LUA_LIBRARY ${PROJECT_BINARY_DIR}/lua-${LUA_VERSION}/source/liblua.a)
     set(LUA_EXECUTABLE ${LUA_SOURCE_DIR}/lua)
 
-    ExternalProject_Add(patched-lua-${LUA_VERSION}
+    ExternalProject_Add(patched-lua
         GIT_REPOSITORY https://github.com/lua/lua
         GIT_TAG ${LUA_VERSION}
         GIT_PROGRESS TRUE
@@ -100,7 +100,7 @@ macro(build_lua LUA_VERSION)
     add_library(bundled-liblua STATIC IMPORTED GLOBAL)
     set_target_properties(bundled-liblua PROPERTIES
       IMPORTED_LOCATION ${LUA_LIBRARY})
-    add_dependencies(bundled-liblua patched-lua-${LUA_VERSION})
+    add_dependencies(bundled-liblua patched-lua)
 
     set(LUA_LIBRARIES bundled-liblua)
     set(LUA_INCLUDE_DIR ${PROJECT_BINARY_DIR}/lua-${LUA_VERSION}/source/)
