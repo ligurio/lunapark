@@ -37,7 +37,7 @@ message(STATUS "Add Lua C API test suite")
 # declared earlier, so we need to add `-g` to CFLAGS by ourselves.
 # See [1].
 #
-# 1. https://github.com/ligurio/lua-c-api-tests/pull/6#discussion_r1185003511
+# 1. https://github.com/ligurio/lunapark/pull/6#discussion_r1185003511
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   AppendFlags(LDFLAGS ${CMAKE_C_FLAGS_DEBUG})
 endif()

@@ -6,9 +6,9 @@
 ################################################################################
 
 # Clean up potentially persistent build directory.
-[[ -e $SRC/lua-c-api-tests/build ]] && rm -rf $SRC/lua-c-api-tests/build
+[[ -e $SRC/lunapark/build ]] && rm -rf $SRC/lunapark/build
 
-cd $SRC/lua-c-api-tests
+cd $SRC/lunapark
 
 # For some reason the linker will complain if address sanitizer is not used
 # in introspector builds.
