@@ -17,17 +17,30 @@
  </tr>
 </table>
 
-# Lua C API tests
+# lunapark
 
 is a set of fuzzing tests for C implementations of Lua runtime (PUC Rio Lua and
 LuaJIT).
 
+<details>
+<summary>If you are interested to know why it is called Lunapark</summary>
+Originally, "lunapark," or more accurately "Luna Park," is a name
+shared by dozens of currently operating and defunct amusement
+parks. Usually, Luna Parks are small-scale attraction parks.
+Fuzzing and debugging Lua runtimes (especially LuaJIT) is also,
+in a sense, an attraction and unforgettable adventure.
+Furthermore, the first word ("luna") in Russian means "moon," the
+only natural satellite of Earth, and the programming language Lua
+(pronounced LOO-ah) also means "moon" in Portuguese. That's why
+the project was named "lunapark".
+</details>
+
 ### Building
 
 ```sh
-git clone https://github.com/ligurio/lua-c-api-tests
-cd lua-c-api-tests
-git clone https://github.com/ligurio/lua-c-api-corpus
+git clone https://github.com/ligurio/lunapark
+cd lunapark
+git clone https://github.com/ligurio/lunapark-corpus
 CC=clang CXX=clang++ cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DUSE_LUA=ON [-DUSE_LUAJIT=ON]
 cmake --build build --parallel
 ```

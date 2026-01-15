@@ -37,7 +37,7 @@ jobs:
           parallel-fuzzing: true
           storage-repo-branch-coverage: gh-pages
           storage-repo-branch: cfl
-          storage-repo: https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/ligurio/lua-c-api-corpus
+          storage-repo: https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/ligurio/lunapark-corpus
 
 # Corpus Pruning ("prune").
 # Over time, redundant testcases will get introduced into your fuzzer's corpuses
@@ -66,4 +66,4 @@ jobs:
           parallel-fuzzing: true
           storage-repo-branch-coverage: gh-pages
           storage-repo-branch: cfl
-          storage-repo: https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/ligurio/lua-c-api-corpus
+          storage-repo: https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/ligurio/lunapark-corpus
