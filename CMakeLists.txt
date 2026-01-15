@@ -8,11 +8,6 @@ project(lua-c-api-tests
 find_program(SHELL sh)
 find_program(ECHO echo)
 
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
-set(CMAKE_INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_INCLUDE_PATH})
-
-include(cmake/utils.cmake)
-
 option(USE_LUA "Use PUC Rio Lua library" OFF)
 option(USE_LUAJIT "Use LuaJIT library" OFF)
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
@@ -30,6 +25,7 @@ option(ENABLE_LAPI_TESTS "Enable Lua API tests" OFF)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 set(CMAKE_INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_INCLUDE_PATH})
 
+include(utils)
 include(SetBuildParallelLevel)
 include(SetHardwareArch)
 
