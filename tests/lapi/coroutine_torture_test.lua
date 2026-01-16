@@ -1,6 +1,6 @@
 --[[
 SPDX-License-Identifier: ISC
-Copyright (c) 2023-2025, Sergey Bronnikov.
+Copyright (c) 2023-2026, Sergey Bronnikov.
 
 2.6 – Coroutines
 https://www.lua.org/manual/5.3/manual.html#2.6

@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: ISC
  *
- * Copyright 2023-2024, Sergey Bronnikov.
+ * Copyright 2023-2026, Sergey Bronnikov.
  */
 
 extern "C"

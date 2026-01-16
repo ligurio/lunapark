@@ -1,6 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-2-Clause
  *
+ * Copyright 2023-2026, Sergey Bronnikov.
  * Copyright 2022, Tarantool AUTHORS, please see AUTHORS file.
  */
 #include "serializer.h"

@@ -133,5 +133,5 @@ limitations in LuaJIT and PUC Rio Lua:
 
 ### License
 
-Copyright (C) 2022-2025 [Sergey Bronnikov](https://bronevichok.ru/),
+Copyright (C) 2022-2026 [Sergey Bronnikov](https://bronevichok.ru/),
 released under the ISC license. See a full Copyright Notice in the LICENSE file.
