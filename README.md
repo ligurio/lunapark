@@ -75,6 +75,7 @@ cd build && RUNS=100000 ctest -R luaL_gsub_test --verbose
 
 ### References
 
+- [Lua 5.5 Reference Manual: 4 – The Application Program Interface](https://www.lua.org/manual/5.5/manual.html#4)
 - [Lua 5.4 Reference Manual: 4 – The Application Program Interface](https://www.lua.org/manual/5.4/manual.html#4)
 - [Lua 5.3 Reference Manual: 4 – The Application Program Interface](https://www.lua.org/manual/5.3/manual.html#4)
 - [Lua 5.2 Reference Manual: 4 – The Application Program Interface](https://www.lua.org/manual/5.2/manual.html#4)
