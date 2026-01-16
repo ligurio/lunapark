@@ -1,6 +1,6 @@
 --[[
 SPDX-License-Identifier: ISC
-Copyright (c) 2023-2025, Sergey Bronnikov.
+Copyright (c) 2023-2026, Sergey Bronnikov.
 
 Wrong code generation for constants in bitwise operations,
 https://github.com/lua/lua/commit/c764ca71a639f5585b5f466bea25dc42b855a4b0

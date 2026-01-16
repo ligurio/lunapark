@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: ISC
  *
- * Copyright 2022-2024, Sergey Bronnikov
+ * Copyright 2022-2026, Sergey Bronnikov
  */
 
 #include <stdint.h>

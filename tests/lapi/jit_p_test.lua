@@ -1,6 +1,6 @@
 --[[
 SPDX-License-Identifier: ISC
-Copyright (c) 2025, Sergey Bronnikov.
+Copyright (c) 2026, Sergey Bronnikov.
 
 LuaJIT profiler,
 https://luajit.org/ext_profiler.html

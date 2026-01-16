@@ -1,6 +1,6 @@
 --[=====[
 SPDX-License-Identifier: ISC
-Copyright (c) 2023-2025, Sergey Bronnikov.
+Copyright (c) 2023-2026, Sergey Bronnikov.
 
 18 – The Mathematical Library
 https://www.lua.org/pil/18.html
