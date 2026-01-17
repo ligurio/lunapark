@@ -27,7 +27,11 @@ if test_lib.lua_version() ~= "LuaJIT" then
     os.exit(0)
 end
 
-local string_buf = require("string.buffer")
+local has_string_buf, string_buf = pcall(require, "string.buffer")
+if not has_string_buf then
+    print("Unsupported version.")
+    os.exit(0)
+end
 
 local function TestOneInput(buf, _size)
     local fdp = luzer.FuzzedDataProvider(buf)

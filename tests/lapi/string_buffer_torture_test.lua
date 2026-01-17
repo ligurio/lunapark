@@ -37,7 +37,11 @@ if test_lib.lua_version() ~= "LuaJIT" then
 end
 
 local ffi = require("ffi")
-local string_buf = require("string.buffer")
+local has_string_buf, string_buf = pcall(require, "string.buffer")
+if not has_string_buf then
+    print("Unsupported version.")
+    os.exit(0)
+end
 local unpack = unpack or table.unpack
 
 local MAX_N = 1e2
