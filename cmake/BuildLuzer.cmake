@@ -16,6 +16,7 @@ list(APPEND LUZER_CMAKE_FLAGS
     "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
     "-DLUA_INCLUDE_DIR=${LUA_INCLUDE_DIR}"
     "-DLUA_LIBRARIES=${LUA_LIBRARIES_LOCATION}"
+    "-DOSS_FUZZ=${OSS_FUZZ}"
 )
 # Prevents an error on loading `luzer_impl.so` due to undefined
 # symbol `llvm_gcda_summary_info`.
@@ -34,7 +35,7 @@ endif()
 
 ExternalProject_Add(bundled-luzer
     GIT_REPOSITORY https://github.com/ligurio/luzer
-    GIT_TAG 872ef1897df2d6c79fed0be84a3c5e916f2f8d4e
+    GIT_TAG aae4bbde656a9ef464cc1532c92a420a9d438219
     GIT_PROGRESS TRUE
     GIT_SHALLOW FALSE
     SOURCE_DIR ${LUZER_DIR}/source
