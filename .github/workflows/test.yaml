@@ -2,10 +2,6 @@ name: Testing
 
 on:
   push:
-    branches:
-      - 'master'
-  pull_request:
-    types: [opened, reopened, synchronize]
 
 concurrency:
   # Update of a developer branch cancels the previously scheduled workflow
