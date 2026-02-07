@@ -109,17 +109,19 @@ function(create_test)
   endif()
 endfunction()
 
-# These Lua C functions are unsupported by LuaJIT.
-list(APPEND LUAJIT_BLACKLIST_TESTS "luaL_addgsub_test")
-list(APPEND LUAJIT_BLACKLIST_TESTS "luaL_bufflen_test")
-list(APPEND LUAJIT_BLACKLIST_TESTS "luaL_buffsub_test")
-list(APPEND LUAJIT_BLACKLIST_TESTS "luaL_buffaddr_test")
-list(APPEND LUAJIT_BLACKLIST_TESTS "lua_stringtonumber_test")
-# Disabled because assertion is triggered
-# LuaJIT ASSERT lj_bcread.c:123: bcread_byte: buffer read overflow.
-list(APPEND LUAJIT_BLACKLIST_TESTS "luaL_dostring_test")
-list(APPEND LUAJIT_BLACKLIST_TESTS "luaL_loadbuffer_test")
-list(APPEND LUAJIT_BLACKLIST_TESTS "luaL_loadstring_test")
+list(APPEND LUAJIT_BLACKLIST_TESTS
+  # These Lua C functions are unsupported by LuaJIT.
+  luaL_addgsub_test
+  luaL_bufflen_test
+  luaL_buffsub_test
+  luaL_buffaddr_test
+  lua_stringtonumber_test
+  # Disabled because assertion is triggered
+  # LuaJIT ASSERT lj_bcread.c:123: bcread_byte: buffer read overflow.
+  luaL_dostring_test
+  luaL_loadbuffer_test
+  luaL_loadstring_test
+)
 
 file(GLOB tests LIST_DIRECTORIES false ${CMAKE_CURRENT_SOURCE_DIR} *.c *.cc)
 foreach(filename ${tests})
@@ -127,12 +129,12 @@ foreach(filename ${tests})
   if (IS_LUAJIT AND (${test_name} IN_LIST LUAJIT_BLACKLIST_TESTS))
     continue()
   endif ()
-  if ((${test_name} IN_LIST BLACKLIST_TESTS))
+  if (${test_name} IN_LIST BLACKLIST_TESTS)
     continue()
   endif ()
   create_test(FILENAME ${test_name}
-              SOURCES ${filename}
-              LIBRARIES "")
+    SOURCES ${filename}
+  )
 endforeach()
 
 include(ProtobufMutator)
