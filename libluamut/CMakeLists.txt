@@ -1,10 +1,14 @@
 set(CFLAGS -Wall -Wextra -Wpedantic -Wno-unused-parameter)
 
 if (ENABLE_COV)
-  set(CFLAGS ${CFLAGS} -fprofile-instr-generate -fprofile-arcs
-             -fcoverage-mapping -ftest-coverage)
-  set(LDFLAGS ${LDFLAGS} -fprofile-instr-generate -fprofile-arcs
-              -fcoverage-mapping -ftest-coverage)
+  string(JOIN " " CODE_COVERAGE_FLAGS
+    -fcoverage-mapping
+    -fprofile-arcs
+    -fprofile-instr-generate
+    -ftest-coverage
+  )
+  AppendFlags(CFLAGS ${CODE_COVERAGE_FLAGS})
+  AppendFlags(LDFLAGS ${CODE_COVERAGE_FLAGS})
 endif()
 
 set(LIB_LUA_MUTATE lua_mutate)

@@ -6,28 +6,33 @@ macro(build_lua LUA_VERSION)
 
     set(CFLAGS "${CMAKE_C_FLAGS} -fno-omit-frame-pointer")
     if (ENABLE_LUA_ASSERT)
-        set(CFLAGS "${CFLAGS} -DLUAI_ASSERT")
-    endif (ENABLE_LUA_ASSERT)
+        AppendFlags(CFLAGS -DLUAI_ASSERT)
+    endif()
     if (ENABLE_LUA_APICHECK)
-        set(CFLAGS "${CFLAGS} -DLUA_USE_APICHECK")
-    endif (ENABLE_LUA_APICHECK)
+        AppendFlags(CFLAGS -DLUA_USE_APICHECK)
+    endif()
     if(NOT ENABLE_CBMC_PROOFS)
-        set(CFLAGS "${CFLAGS} -fsanitize=fuzzer-no-link")
-        set(LDFLAGS "-fsanitize=fuzzer-no-link")
+        AppendFlags(CFLAGS -fsanitize=fuzzer-no-link)
+        AppendFlags(LDFLAGS -fsanitize=fuzzer-no-link)
     endif()
     if (OSS_FUZZ)
-        set(LDFLAGS "${CFLAGS} ${LDFLAGS}")
-    endif (OSS_FUZZ)
+        AppendFlags(LDFLAGS ${CFLAGS})
+    endif()
 
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(CFLAGS "${CFLAGS} ${CMAKE_C_FLAGS_DEBUG}")
-        set(LDFLAGS "${LDFLAGS} ${CMAKE_C_FLAGS_DEBUG}")
-    endif (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        AppendFlags(CFLAGS ${CMAKE_C_FLAGS_DEBUG})
+        AppendFlags(LDFLAGS ${CMAKE_C_FLAGS_DEBUG})
+    endif()
 
     if (ENABLE_ASAN)
-        set(CFLAGS "${CFLAGS} -fsanitize=address -fsanitize=pointer-subtract -fsanitize=pointer-compare")
-        set(LDFLAGS "${LDFLAGS} -fsanitize=address")
-    endif (ENABLE_ASAN)
+        string(JOIN " " ASAN_FLAGS
+          -fsanitize=address
+          -fsanitize=pointer-subtract
+          -fsanitize=pointer-compare
+        )
+        AppendFlags(CFLAGS ${ASAN_FLAGS})
+        AppendFlags(LDFLAGS -fsanitize=address)
+    endif()
 
     if (ENABLE_UBSAN)
         string(JOIN "," NO_SANITIZE_FLAGS
@@ -46,28 +51,36 @@ macro(build_lua LUA_VERSION)
             # lstring.c:luaS_hash()
             unsigned-shift-base
         )
-        set(UBSAN_FLAGS "-fsanitize=undefined")
-        set(UBSAN_FLAGS "-fno-sanitize-recover=undefined")
-        set(UBSAN_FLAGS "-fno-sanitize=${NO_SANITIZE_FLAGS}")
-        set(CFLAGS "${CFLAGS} ${UBSAN_FLAGS}")
-        set(LDFLAGS "${LDFLAGS} ${UBSAN_FLAGS}")
-    endif (ENABLE_UBSAN)
+        string(JOIN " " ASAN_FLAGS
+          -fsanitize=undefined
+          -fno-sanitize-recover=undefined
+          -fno-sanitize=${NO_SANITIZE_FLAGS}
+        )
+        AppendFlags(CFLAGS ${UBSAN_FLAGS})
+        AppendFlags(LDFLAGS ${UBSAN_FLAGS})
+    endif()
 
     if (ENABLE_COV)
-        set(CFLAGS "${CFLAGS} -fprofile-instr-generate  -fprofile-arcs -fcoverage-mapping -ftest-coverage")
-        set(LDFLAGS "${LDFLAGS} -fprofile-instr-generate -fprofile-arcs -fcoverage-mapping -ftest-coverage")
-    endif (ENABLE_COV)
+        string(JOIN " " CODE_COVERAGE_FLAGS
+          -fcoverage-mapping
+          -fprofile-arcs
+          -fprofile-instr-generate
+          -ftest-coverage
+        )
+        AppendFlags(CFLAGS ${CODE_COVERAGE_FLAGS})
+        AppendFlags(LDFLAGS ${CODE_COVERAGE_FLAGS})
+    endif()
 
     if(ENABLE_LAPI_TESTS)
         # "relocation R_X86_64_PC32 against symbol `lua_isnumber'
         # can not be used when making a shared object; recompile
         # with -fPIC".
-        set(CFLAGS "${CFLAGS} -fPIC")
-        set(CFLAGS "${CFLAGS} -DLUA_USE_DLOPEN")
+        AppendFlags(CFLAGS -fPIC)
+        AppendFlags(CFLAGS -DLUA_USE_DLOPEN)
         # `io.popen()` is not supported by default, it is enabled
         # by `LUA_USE_POSIX` flag. Required by a function `random_locale()`.
-        set(CFLAGS "${CFLAGS} -DLUA_USE_POSIX")
-        set(LDFLAGS "${LDFLAGS} -lstdc++")
+        AppendFlags(CFLAGS -DLUA_USE_POSIX)
+        AppendFlags(LDFLAGS -lstdc++)
     endif()
 
     include(ExternalProject)
