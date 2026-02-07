@@ -4,32 +4,35 @@ macro(build_luajit LJ_VERSION)
 
     set(CFLAGS ${CMAKE_C_FLAGS})
     if (ENABLE_LUA_ASSERT)
-        set(CFLAGS "${CFLAGS} -DLUA_USE_ASSERT")
-    endif (ENABLE_LUA_ASSERT)
+        AppendFlags(CFLAGS -DLUA_USE_ASSERT)
+    endif()
     if (ENABLE_LUA_APICHECK)
-        set(CFLAGS "${CFLAGS} -DLUA_USE_APICHECK")
-    endif (ENABLE_LUA_APICHECK)
+        AppendFlags(CFLAGS -DLUA_USE_APICHECK)
+    endif()
 
-    set(CFLAGS "${CFLAGS} -fsanitize=fuzzer-no-link")
-    set(LDFLAGS "-fsanitize=fuzzer-no-link")
+    AppendFlags(CFLAGS -fsanitize=fuzzer-no-link)
+    AppendFlags(LDFLAGS -fsanitize=fuzzer-no-link)
 
     set(LUAJIT_BASEDIR ${PROJECT_SOURCE_DIR}/patches/)
 
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(CFLAGS "${CFLAGS} ${CMAKE_C_FLAGS_DEBUG}")
-        set(LDFLAGS "${LDFLAGS} ${CMAKE_C_FLAGS_DEBUG}")
-    endif (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        AppendFlags(CFLAGS ${CMAKE_C_FLAGS_DEBUG})
+        AppendFlags(LDFLAGS ${CMAKE_C_FLAGS_DEBUG})
+    endif()
 
     if (ENABLE_LUAJIT_RANDOM_RA)
-        set(CFLAGS "${CFLAGS} -DLUAJIT_RANDOM_RA")
-    endif (ENABLE_LUAJIT_RANDOM_RA)
+        AppendFlags(CFLAGS -DLUAJIT_RANDOM_RA)
+    endif()
 
     if (ENABLE_ASAN)
-        set(CFLAGS "${CFLAGS} -fsanitize=address")
-        set(CFLAGS "${CFLAGS} -DLUAJIT_USE_ASAN")
-        set(CFLAGS "${CFLAGS} -DLUAJIT_USE_SYSMALLOC=1")
-        set(LDFLAGS "${LDFLAGS} -fsanitize=address")
-    endif (ENABLE_ASAN)
+        string(JOIN " " ASAN_FLAGS
+          -fsanitize=address
+          -DLUAJIT_USE_ASAN
+          -DLUAJIT_USE_SYSMALLOC=1
+        )
+        AppendFlags(CFLAGS ${ASAN_FLAGS})
+        AppendFlags(LDFLAGS -fsanitize=address)
+    endif()
 
     if (ENABLE_UBSAN)
         string(JOIN "," NO_SANITIZE_FLAGS
@@ -65,30 +68,37 @@ macro(build_luajit LJ_VERSION)
         # point division by zero behaviour is defined without
         # -ffast-math and uses the IEEE 754 standard on which all
         # NaN tagging is based.
-        set(UBSAN_FLAGS "-fsanitize=undefined")
-        set(UBSAN_FLAGS "-fno-sanitize-recover=undefined")
-        # XXX: To get nicer stack traces in error messages.
-        set(UBSAN_FLAGS "-fno-omit-frame-pointer")
-        set(UBSAN_FLAGS "-fno-sanitize=${NO_SANITIZE_FLAGS}")
-        set(CFLAGS "${CFLAGS} -DLUAJIT_USE_UBSAN")
-        set(CFLAGS "${CFLAGS} ${UBSAN_FLAGS}")
-        set(LDFLAGS "${LDFLAGS} ${UBSAN_FLAGS}")
-    endif (ENABLE_UBSAN)
+        string(JOIN " " UBSAN_FLAGS
+          -fsanitize=undefined
+          -fno-sanitize-recover=undefined
+          # XXX: To get nicer stack traces in error messages.
+          -fno-omit-frame-pointer
+          -fno-sanitize=${NO_SANITIZE_FLAGS}
+        )
+        AppendFlags(CFLAGS -DLUAJIT_USE_UBSAN ${UBSAN_FLAGS})
+        AppendFlags(LDFLAGS ${UBSAN_FLAGS})
+    endif()
 
     if (ENABLE_COV)
-        set(CFLAGS "${CFLAGS} -fprofile-instr-generate -fprofile-arcs -fcoverage-mapping -ftest-coverage")
-        set(LDFLAGS "${LDFLAGS} -fprofile-instr-generate -fprofile-arcs -fcoverage-mapping -ftest-coverage")
-    endif (ENABLE_COV)
+        string(JOIN " " CODE_COVERAGE_FLAGS
+            -fcoverage-mapping
+            -fprofile-arcs
+            -fprofile-instr-generate
+            -ftest-coverage
+        )
+        AppendFlags(CFLAGS ${CODE_COVERAGE_FLAGS})
+        AppendFlags(LDFLAGS ${CODE_COVERAGE_FLAGS})
+    endif()
 
     if(ENABLE_LAPI_TESTS)
         # "relocation R_X86_64_PC32 against symbol `lua_isnumber'
         # can not be used when making a shared object; recompile
         # with -fPIC".
-        set(CFLAGS "${CFLAGS} -fPIC")
+        AppendFlags(CFLAGS -fPIC)
         # CMake option LUAJIT_FRIENDLY_MODE in luzer requires
         # LUAJIT_ENABLE_CHECKHOOK.
-        set(CFLAGS "${CFLAGS} -DLUAJIT_ENABLE_CHECKHOOK")
-        set(LDFLAGS "${LDFLAGS} -lstdc++")
+        AppendFlags(CFLAGS -DLUAJIT_ENABLE_CHECKHOOK)
+        AppendFlags(LDFLAGS -lstdc++)
     endif()
 
     include(ExternalProject)
