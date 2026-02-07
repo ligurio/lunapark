@@ -50,6 +50,11 @@ function(create_test)
     COMMAND ${SHELL} -c "${LUA_EXECUTABLE} ${FUZZ_FILENAME} ${LIBFUZZER_OPTS}"
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   )
+  if(ENABLE_COV)
+    list(APPEND TEST_ENV
+      LLVM_PROFILE_FILE=${test_name}.%1m.%p.profraw
+    )
+  endif()
   set_tests_properties(${test_name} PROPERTIES
     LABELS "lapi"
     ENVIRONMENT "${TEST_ENV}"

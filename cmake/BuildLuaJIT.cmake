@@ -80,12 +80,6 @@ macro(build_luajit LJ_VERSION)
     endif()
 
     if (ENABLE_COV)
-        string(JOIN " " CODE_COVERAGE_FLAGS
-            -fcoverage-mapping
-            -fprofile-arcs
-            -fprofile-instr-generate
-            -ftest-coverage
-        )
         AppendFlags(CFLAGS ${CODE_COVERAGE_FLAGS})
         AppendFlags(LDFLAGS ${CODE_COVERAGE_FLAGS})
     endif()

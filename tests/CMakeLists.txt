@@ -12,6 +12,16 @@ string(JOIN " " LIBFUZZER_OPTS
   -workers=${CMAKE_BUILD_PARALLEL_LEVEL}
 )
 
+if(ENABLE_COV)
+  string(JOIN " " LIBFUZZER_OPTS
+    ${LIBFUZZER_OPTS}
+    -ignore_ooms=1
+    -ignore_timeouts=1
+    -ignore_crashes=1
+    -timeout=1
+  )
+endif()
+
 set(CORPUS_BASE_PATH ${PROJECT_SOURCE_DIR}/corpus)
 if(IS_LUAJIT)
   set(CORPUS_BASE_PATH ${CORPUS_BASE_PATH}/corpus)

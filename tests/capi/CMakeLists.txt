@@ -95,13 +95,19 @@ function(create_test)
   add_test(NAME ${test_name}
            COMMAND ${SHELL} -c "$<TARGET_FILE:${test_name}> ${LIBFUZZER_OPTS}"
   )
+  if(ENABLE_COV)
+    list(APPEND TEST_ENV
+      LLVM_PROFILE_FILE=${test_name}.%1m.%p.profraw
+    )
+  endif()
   if (USE_LUA)
-    set_tests_properties(${test_name} PROPERTIES
-      ENVIRONMENT "ASAN_OPTIONS='detect_invalid_pointer_pairs=2'"
+    list(APPEND TEST_ENV
+      ASAN_OPTIONS='detect_invalid_pointer_pairs=2'
     )
   endif()
   set_tests_properties(${test_name} PROPERTIES
     LABELS capi
+    ENVIRONMENT "${TEST_ENV}"
   )
 
   if (IS_LUAJIT)

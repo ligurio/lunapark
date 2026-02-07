@@ -29,8 +29,16 @@ set(CMAKE_INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_INCLUDE_PATH}
 include(utils)
 include(SetBuildParallelLevel)
 include(SetHardwareArch)
+if(ENABLE_COV)
+  include(CodeCoverage)
+endif()
 
-if (ENABLE_LAPI_TESTS)
+# Code coverage tools can conflict with LibFuzzer, typically
+# resulting in drastically slower execution speeds, crash
+# reproduction failures, or inaccurate coverage reports.
+# Disable libFuzzer static linkage when code coverage is enabled.
+if (ENABLE_LAPI_TESTS AND NOT ENABLE_COV)
+  message(STATUS "libFuzzer static linkage is enabled")
   include(LibFuzzer)
   SetLibFuzzerPath(FUZZER_NO_MAIN_LIBRARY)
   SetLibFuzzerObjDir(LibFuzzerObjDir)
@@ -105,10 +113,6 @@ if (NOT Protobuf_FOUND)
 endif()
 
 SetBuildParallelLevel(CMAKE_BUILD_PARALLEL_LEVEL)
-
-if(ENABLE_COV)
-    include(CodeCoverage)
-endif()
 
 add_subdirectory(extra)
 add_subdirectory(libluamut)
