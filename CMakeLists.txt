@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.18)
 
-project(lua-c-api-tests
+project(lunapark
   LANGUAGES C CXX
   VERSION "1.0.0"
 )
