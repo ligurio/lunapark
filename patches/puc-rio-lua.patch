@@ -1,3 +1,41 @@
+diff --git a/lgc.c b/lgc.c
+index 0f89451c..c100b44b 100644
+--- a/lgc.c
++++ b/lgc.c
+@@ -1585,6 +1585,7 @@ static void atomic (lua_State *L) {
+ ** Do a sweep step. The normal case (not fast) sweeps at most GCSWEEPMAX
+ ** elements. The fast case sweeps the whole list.
+ */
++__attribute__((no_sanitize("implicit-integer-sign-change")))
+ static void sweepstep (lua_State *L, global_State *g,
+                        lu_byte nextstate, GCObject **nextlist, int fast) {
+   if (g->sweepgc)
+diff --git a/lstring.c b/lstring.c
+index 75635142..72411834 100644
+--- a/lstring.c
++++ b/lstring.c
+@@ -49,7 +49,7 @@ int luaS_eqstr (TString *a, TString *b) {
+           (memcmp(s1, s2, len1) == 0));  /* equal contents */
+ }
+
+-
++__attribute__((no_sanitize("shift", "unsigned-integer-overflow", "unsigned-shift-base")))
+ static unsigned luaS_hash (const char *str, size_t l, unsigned seed) {
+   unsigned int h = seed ^ cast_uint(l);
+   for (; l > 0; l--)
+diff --git a/lvm.c b/lvm.c
+index c70e2b8a..3e3274de 100644
+--- a/lvm.c
++++ b/lvm.c
+@@ -1194,7 +1194,7 @@ void luaV_finishOp (lua_State *L) {
+ #define vmcase(l)	case l:
+ #define vmbreak		break
+
+-
++__attribute__((no_sanitize("float-divide-by-zero", "integer-divide-by-zero")))
+ void luaV_execute (lua_State *L, CallInfo *ci) {
+   LClosure *cl;
+   TValue *k;
 diff --git a/makefile b/makefile
 index 8674519f..dd0fb23e 100644
 --- a/makefile
