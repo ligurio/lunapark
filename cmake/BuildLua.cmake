@@ -36,20 +36,8 @@ macro(build_lua LUA_VERSION)
 
     if (ENABLE_UBSAN)
         string(JOIN "," NO_SANITIZE_FLAGS
-            # lvm.c:luaV_execute()
-            float-divide-by-zero
-            # lgc.c:sweepstep()
-            implicit-integer-sign-change
-            # lvm.c:luaV_execute()
-            integer-divide-by-zero
             # The object size sanitizer has no effect at -O0.
             object-size
-            # lstring.c:luaS_hash()
-            shift
-            # lstring.c:luaS_hash()
-            unsigned-integer-overflow
-            # lstring.c:luaS_hash()
-            unsigned-shift-base
         )
         string(JOIN " " ASAN_FLAGS
           -fsanitize=undefined
