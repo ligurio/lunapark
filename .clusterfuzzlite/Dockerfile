@@ -14,3 +14,4 @@ COPY . $SRC/lunapark
 WORKDIR $SRC/lunapark
 RUN git clone --depth 1 --branch cfl https://github.com/ligurio/lunapark-corpus corpus
 COPY .clusterfuzzlite/build.sh $SRC/
+COPY .clusterfuzzlite/compile_lua_fuzzer $SRC/
