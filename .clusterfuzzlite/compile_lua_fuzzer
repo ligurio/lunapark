@@ -33,7 +33,7 @@ set -eu
 project_dir=\$(dirname \$(realpath \"\$0\"))
 eval \$(luarocks --lua-version 5.1 --tree \$project_dir/lua_modules path)
 export LUA_PATH=\"\$project_dir/?.lua;\$LUA_PATH\"
-ASAN_OPTIONS=\$ASAN_OPTIONS:symbolize=1:external_symbolizer_path=\$project_dir/llvm-symbolizer:detect_leaks=0 \
+ASAN_OPTIONS=\$ASAN_OPTIONS:symbolize=1:external_symbolizer_path=\$project_dir/llvm-symbolizer \
 \$project_dir/$lua_runtime \$project_dir/$fuzz_target \$@" > "$OUT/$fuzzer_basename"
 
 chmod +x "$OUT/$fuzzer_basename"
