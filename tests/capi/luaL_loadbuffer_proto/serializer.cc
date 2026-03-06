@@ -20,6 +20,8 @@
 #  define unreachable() (assert(0))
 #endif
 
+#define UNUSED __attribute__((unused))
+
 using namespace lua_grammar;
 
 extern char preamble_lua[];
@@ -109,12 +111,21 @@ PROTO_TOSTRING(Function, func);
 NESTED_PROTO_TOSTRING(FuncName, funcname, Function);
 
 PROTO_TOSTRING(NameList, namelist);
-NESTED_PROTO_TOSTRING(NameListWithEllipsis, namelist, FuncBody);
+PROTO_TOSTRING(AttName, attname);
+PROTO_TOSTRING(AttNameList, attnamelist);
+NESTED_PROTO_TOSTRING(NameListWithVarargParam, namelist, FuncBody);
 NESTED_PROTO_TOSTRING(ParList, parlist, FuncBody);
 
 /** LocalFunc and LocalNames clauses. */
 PROTO_TOSTRING(LocalFunc, localfunc);
 PROTO_TOSTRING(LocalNames, localnames);
+
+#if LUA_VERSION_NUM >= 505
+/** GlobalFunc, GlobalNames and GlobalStar clauses (Lua 5.5). */
+PROTO_TOSTRING(GlobalFunc, globalfunc);
+PROTO_TOSTRING(GlobalNames, globalnames);
+PROTO_TOSTRING(GlobalStar, globalstar);
+#endif
 
 /**
  * Expressions and variables.
@@ -417,11 +428,11 @@ FuncBodyHasVararg(const FuncBody &body)
 	const FuncBody::ParList &parlist = body.parlist();
 	switch (parlist.parlist_oneof_case()) {
 	case FuncBody::ParList::ParlistOneofCase::kNamelist:
-		return parlist.namelist().has_ellipsis();
-	case FuncBody::ParList::ParlistOneofCase::kEllipsis:
+		return parlist.namelist().has_vararg();
+	case FuncBody::ParList::ParlistOneofCase::kVararg:
 		return true;
 	default:
-		return parlist.namelist().has_ellipsis();
+		return parlist.namelist().has_vararg();
 	}
 }
 
@@ -618,6 +629,17 @@ PROTO_TOSTRING(Statement, stat)
 	case StatType::kLocalnames:
 		stat_str = LocalNamesToString(stat.localnames());
 		break;
+#if LUA_VERSION_NUM >= 505
+	case StatType::kGlobalfunc:
+		stat_str = GlobalFuncToString(stat.globalfunc());
+		break;
+	case StatType::kGlobalnames:
+		stat_str = GlobalNamesToString(stat.globalnames());
+		break;
+	case StatType::kGlobalstar:
+		stat_str = GlobalStarToString(stat.globalstar());
+		break;
+#endif
 	default:
 		/**
 		 * Chosen arbitrarily more for simplicity.
@@ -865,11 +887,17 @@ PROTO_TOSTRING(NameList, namelist)
 	return namelist_str;
 }
 
-NESTED_PROTO_TOSTRING(NameListWithEllipsis, namelist, FuncBody)
+NESTED_PROTO_TOSTRING(NameListWithVarargParam, namelist, FuncBody)
 {
 	std::string namelist_str = NameListToString(namelist.namelist());
-	if (namelist.has_ellipsis())
+	if (namelist.has_vararg()) {
 		namelist_str += ", ...";
+#if LUA_VERSION_NUM >= 505
+		if (!namelist.vararg().name().empty())
+			namelist_str += " " + ConvertToStringDefault(
+				namelist.vararg().name(), true);
+#endif
+	}
 	return namelist_str;
 }
 
@@ -878,12 +906,20 @@ NESTED_PROTO_TOSTRING(ParList, parlist, FuncBody)
 	using ParListType = FuncBody::ParList::ParlistOneofCase;
 	switch (parlist.parlist_oneof_case()) {
 	case ParListType::kNamelist:
-		return NameListWithEllipsisToString(parlist.namelist());
-	case ParListType::kEllipsis:
-		return "...";
+		return NameListWithVarargParamToString(parlist.namelist());
+	case ParListType::kVararg:
+	{
+		std::string vararg_str = "...";
+#if LUA_VERSION_NUM >= 505
+		if (!parlist.vararg().name().empty())
+			vararg_str += " " + ConvertToStringDefault(
+				parlist.vararg().name(), true);
+#endif
+		return vararg_str;
+	}
 	default:
 		/* Chosen as default in order to decrease number of ellipses. */
-		return NameListWithEllipsisToString(parlist.namelist());
+		return NameListWithVarargParamToString(parlist.namelist());
 	}
 }
 
@@ -903,19 +939,105 @@ PROTO_TOSTRING(LocalFunc, localfunc)
 	return localfunc_str;
 }
 
+UNUSED static std::string
+AttribToString(const lua_grammar::Attribute &attr)
+{
+	switch (attr.attrib_case()) {
+	case lua_grammar::Attribute::kConst:
+		return "<const>";
+	case lua_grammar::Attribute::kClose:
+		return "<close>";
+	default:
+		return "";
+	}
+}
+
+PROTO_TOSTRING(AttName, attname)
+{
+	std::string name_str;
+
+#if LUA_VERSION_NUM >= 504
+	if (attname.has_prefix())
+		name_str += AttribToString(attname.prefix()) + " ";
+#endif
+
+	name_str += NameToString(attname.name());
+
+#if LUA_VERSION_NUM >= 504
+	if (attname.has_suffix())
+		name_str += " " + AttribToString(attname.suffix());
+#endif
+
+	return name_str;
+}
+
+PROTO_TOSTRING(AttNameList, attnamelist)
+{
+	std::string namelist_str = AttNameToString(attnamelist.firstname());
+	for (int i = 0; i < attnamelist.names_size(); ++i)
+		namelist_str += ", " + AttNameToString(attnamelist.names(i));
+	return namelist_str;
+}
+
 /**
  * LocalNames clause.
  */
 PROTO_TOSTRING(LocalNames, localnames)
 {
 	std::string localnames_str = "local ";
-	localnames_str += NameListToString(localnames.namelist());
+	localnames_str += AttNameListToString(localnames.namelist());
 
 	if (localnames.has_explist())
 		localnames_str += " = " + ExpressionListToString(
 			localnames.explist());
 	return localnames_str;
 }
+
+#if LUA_VERSION_NUM >= 505
+/**
+ * GlobalFunc clause (Lua 5.5).
+ */
+PROTO_TOSTRING(GlobalFunc, globalfunc)
+{
+	GetContext().step_in(GetFuncBodyType(globalfunc.funcbody()));
+
+	std::string globalfunc_str = "global function ";
+	globalfunc_str += NameToString(globalfunc.name());
+	globalfunc_str += " ";
+	globalfunc_str += FuncBodyToStringReqProtected(globalfunc.funcbody());
+
+	GetContext().step_out();
+	return globalfunc_str;
+}
+
+/**
+ * GlobalNames clause (Lua 5.5).
+ */
+PROTO_TOSTRING(GlobalNames, globalnames)
+{
+	std::string globalnames_str = "global ";
+	globalnames_str += AttNameListToString(globalnames.namelist());
+
+	if (globalnames.has_explist())
+		globalnames_str += " = " + ExpressionListToString(
+			globalnames.explist());
+	return globalnames_str;
+}
+
+/**
+ * GlobalStar clause (Lua 5.5).
+ */
+PROTO_TOSTRING(GlobalStar, globalstar)
+{
+	std::string globalstar_str = "global ";
+
+	if (globalstar.has_attrib())
+		globalstar_str += AttribToString(globalstar.attrib()) + " ";
+
+	globalstar_str += "*";
+	return globalstar_str;
+}
+#endif /* LUA_VERSION_NUM >= 505 */
 
 /**
  * Expressions and variables.
