@@ -6,7 +6,7 @@
  */
 
 /*
- * Grammar is for Lua 5.1.
+ * Grammar covers Lua 5.1 syntax with extensions for Lua 5.3, 5.4 and 5.5.
  * Comments around message definitions are in eBNF notation.
  * Strings defined using a long format enclosed by long brackets are NIY.
  */
@@ -38,7 +38,10 @@ message Chunk {
  *         forcyclelist |
  *         function |
  *         localfunc |
- *         localnames
+ *         localnames |
+ *         globalfunc (5.5) |
+ *         globalnames (5.5) |
+ *         globalstar (5.5)
  */
 message Statement {
     oneof stat_oneof {
@@ -53,6 +56,9 @@ message Statement {
         Function func = 9;
         LocalFunc localfunc = 10;
         LocalNames localnames = 11;
+        GlobalFunc globalfunc = 13;
+        GlobalNames globalnames = 14;
+        GlobalStar globalstar = 15;
     }
     optional bool semicolon = 12;
 }
@@ -162,17 +168,22 @@ message Function {
 
 /* funcbody ::= `(` [parlist] `)` block `end` */
 message FuncBody {
-    /* namelistwithellipsis ::= namelist [`,` `...`] */
-    message NameListWithEllipsis {
-        required NameList namelist = 1;
-        optional string ellipsis = 2;
+    /* varargparam ::= `...` [Name] */
+    message VarargParam {
+        optional string name = 1;
     }
 
-    /* parlist ::= namelistwithellipsis | `...` */
+    /* namelistwithvarargparam ::= namelist [`,` varargparam] */
+    message NameListWithVarargParam {
+        required NameList namelist = 1;
+        optional VarargParam vararg = 2;
+    }
+
+    /* parlist ::= namelistwithvarargparam | varargparam */
     message ParList {
         oneof parlist_oneof {
-            NameListWithEllipsis namelist = 1;
-            string ellipsis = 2;
+            NameListWithVarargParam namelist = 1;
+            VarargParam vararg = 2;
         }
     }
 
@@ -186,16 +197,54 @@ message NameList {
     repeated Name names = 2;
 }
 
+/* attrib ::= ['<' Name '>'] */
+message Attribute {
+    oneof attrib {
+        bool const = 1;
+        bool close = 2;
+    }
+}
+
+/* attname ::= [attrib] Name [attrib] */
+message AttName {
+    required Name name = 1;
+    optional Attribute prefix = 2;
+    optional Attribute suffix = 3;
+}
+
+/* attnamelist ::= [attrib] Name [attrib] {',' Name [attrib]} */
+message AttNameList {
+    required AttName firstname = 1;
+    repeated AttName names = 2;
+}
+
 /* localfunc ::= `local` `function` Name funcbody */
 message LocalFunc {
     required Name name = 1;
     required FuncBody funcbody = 2;
 }
 
-/* localnames ::= `local` namelist [`=` explist] */
+/* localnames ::= `local` attnamelist [`=' explist] */
 message LocalNames {
-    required NameList namelist = 1;
+    required AttNameList namelist = 1;
     optional ExpressionList explist = 2;
+}
+
+/* globalnames ::= `global` attnamelist [`=' explist] (Lua 5.5) */
+message GlobalNames {
+    required AttNameList namelist = 1;
+    optional ExpressionList explist = 2;
+}
+
+/* globalfunc ::= `global` `function` Name funcbody (Lua 5.5) */
+message GlobalFunc {
+    required Name name = 1;
+    required FuncBody funcbody = 2;
+}
+
+/* globalstar ::= `global` [attrib] `*` (Lua 5.5) */
+message GlobalStar {
+    optional Attribute attrib = 1;
 }
 
 /* laststat ::= `return` [explist] | `break` */

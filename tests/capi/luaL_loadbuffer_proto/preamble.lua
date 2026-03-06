@@ -73,6 +73,10 @@ end
 local __unm = function(v)
     return - always_number(v)
 end
+local __close = function()
+    -- No-op for to-be-closed variables (Lua 5.4+).
+end
+
 local __idiv = load([[
     local v1, v2 = ...
     return always_number(v1) // always_number(v2)
@@ -103,6 +107,7 @@ local __shr = load([[
 ]])
 
 debug.setmetatable('string', {
+    __close = __close,
     __add = __add,
     __call = __call,
     __div = __div,
@@ -122,6 +127,7 @@ debug.setmetatable('string', {
     __shr = __shr,
 })
 debug.setmetatable(0, {
+    __close = __close,
     __add = __add,
     __call = __call,
     __concat = __concat,
@@ -132,6 +138,7 @@ debug.setmetatable(0, {
     __newindex = __newindex,
 })
 debug.setmetatable(nil, {
+    __close = __close,
     __add = __add,
     __call = __call,
     __concat = __concat,
@@ -149,6 +156,7 @@ debug.setmetatable(nil, {
     __unm = __unm,
 })
 debug.setmetatable(function() end, {
+    __close = __close,
     __add = __add,
     __concat = __concat,
     __div = __div,
@@ -165,6 +173,7 @@ debug.setmetatable(function() end, {
     __unm = __unm,
 })
 debug.setmetatable(true, {
+    __close = __close,
     __add = __add,
     __call = __call,
     __concat = __concat,
@@ -183,6 +192,7 @@ debug.setmetatable(true, {
 })
 ---@diagnostic disable-next-line: unused
 local table_mt = {
+    __close = __close,
     __add = __add,
     __call = __call,
     __concat = __concat,
