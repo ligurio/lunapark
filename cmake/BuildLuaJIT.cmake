@@ -27,6 +27,7 @@ macro(build_luajit LJ_VERSION)
     if (ENABLE_ASAN)
         string(JOIN " " ASAN_FLAGS
           -fsanitize=address
+          -fno-omit-frame-pointer
           -DLUAJIT_USE_ASAN
           -DLUAJIT_USE_SYSMALLOC=1
         )
@@ -95,6 +96,8 @@ macro(build_luajit LJ_VERSION)
         AppendFlags(LDFLAGS -lstdc++)
     endif()
 
+    AppendFlags(CCDEBUG -g -ggdb3)
+
     include(ExternalProject)
 
     set(LUA_LIBRARY ${LJ_SOURCE_DIR}/src/libluajit.a)
@@ -118,6 +121,7 @@ macro(build_luajit LJ_VERSION)
                       patch -p1 -i ${LUAJIT_BASEDIR}/luajit-dmalloc-asan_instr-v2.1.patch
         CONFIGURE_COMMAND ""
         BUILD_COMMAND cd <SOURCE_DIR> && make -j CC=${CMAKE_C_COMPILER}
+                                                 CCDEBUG=${CCDEBUG}
                                                  CFLAGS=${CFLAGS}
                                                  LDFLAGS=${LDFLAGS}
                                                  HOST_CFLAGS=-fno-sanitize=undefined
