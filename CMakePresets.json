@@ -21,7 +21,7 @@
         },
         "ENABLE_COV": {
           "type": "BOOL",
-          "value": "TRUE"
+          "value": "FALSE"
         },
         "ENABLE_ASAN": {
           "type": "BOOL",
@@ -42,6 +42,10 @@
         "ENABLE_BUILD_PROTOBUF": {
           "type": "BOOL",
           "value": "FALSE"
+        },
+        "ENABLE_LAPI_TESTS": {
+          "type": "BOOL",
+          "value": "TRUE"
         }
       }
     },
