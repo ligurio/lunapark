@@ -1,0 +1,138 @@
+diff --git a/test/fuzz/luaL_loadbuffer/luaL_loadbuffer_fuzzer.cc b/test/fuzz/luaL_loadbuffer/luaL_loadbuffer_fuzzer.cc
+index 05fb39ceb0..24af9ae216 100644
+--- a/test/fuzz/luaL_loadbuffer/luaL_loadbuffer_fuzzer.cc
++++ b/test/fuzz/luaL_loadbuffer/luaL_loadbuffer_fuzzer.cc
+@@ -21,6 +21,74 @@ extern "C"
+ 			  << " (" << (val) * 100 / (total) << "%)" \
+ 			  << std::endl
+ 
++#define LUA_MEMORY_LIMIT_DEFAULT (2ULL * 1024 * 1024 * 1024)
++
++/**
++ * Default allocator function which is wrapped into a new one
++ * with the Lua memory limit checker.
++ */
++static lua_Alloc orig_alloc;
++/**
++ * Memory limit for LuaJIT.
++ */
++static size_t memory_limit = LUA_MEMORY_LIMIT_DEFAULT;
++/**
++ * Amount of memory used by LuaJIT.
++ */
++static size_t used;
++
++/**
++ * Lua custom memory allocation function. It extends the original
++ * one with a memory counter and a limit check.
++ */
++static void *
++alloc_with_limit(void *ud, void *ptr, size_t osize, size_t nsize)
++{
++	size_t new_used = used + nsize - osize;
++	if (new_used > memory_limit) {
++		/*
++		 * Returning NULL results in the "not enough
++		 * memory" error.
++		 */
++		return NULL;
++	}
++
++	void *result = orig_alloc(ud, ptr, osize, nsize);
++
++	if (result != NULL || nsize == 0)
++		used = new_used;
++
++	/*
++	 * Result may be NULL, in this case "not enough memory"
++	 * is raised.
++	 */
++	return result;
++}
++
++static size_t
++getgctotal(struct lua_State *L)
++{
++	return (lua_getgccount(L) * 1024ULL) + lua_gc(L, LUA_GCCOUNTB, 0);
++}
++
++static void
++lua_initalloc(struct lua_State *L)
++{
++	assert(L != NULL);
++
++	used = getgctotal(L);
++
++	void *orig_ud;
++	orig_alloc = lua_getallocf(L, &orig_ud);
++
++	assert(orig_alloc != NULL);
++
++	if (::getenv("LUA_MEMMAX"))
++		memory_limit = std::stoi(::getenv("LUA_MEMMAX"));
++
++	lua_setallocf(L, alloc_with_limit, orig_ud);
++}
++
+ struct metrics {
+ 	size_t total_num;
+ 	size_t total_num_with_errors;
+@@ -111,6 +179,7 @@ DEFINE_PROTO_FUZZER(const lua_grammar::Block &message)
+ 	if (!L)
+ 		return;
+ 
++	lua_initalloc(L);
+ 	std::string code = luajit_fuzzer::MainBlockToString(message);
+ 
+ 	if (::getenv("LPM_DUMP_NATIVE_INPUT") && code.size() != 0) {
+@@ -130,6 +199,8 @@ DEFINE_PROTO_FUZZER(const lua_grammar::Block &message)
+ 
+ 	if (luaL_loadbuffer(L, code.c_str(), code.size(), "fuzz") != LUA_OK) {
+ 		report_error(L, "luaL_loadbuffer()");
++
++		std::cout << code << std::endl;
+ 		goto end;
+ 	}
+ 
+@@ -140,8 +211,9 @@ DEFINE_PROTO_FUZZER(const lua_grammar::Block &message)
+ 	 * needed to describe Lua semantics for more interesting
+ 	 * results and fuzzer tests.
+ 	 */
+-	if (lua_pcall(L, 0, 0, 0) != LUA_OK)
++	if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
+ 		report_error(L, "lua_pcall()");
++	}
+ 
+ end:
+ 	metrics.total_num++;
+diff --git a/test/fuzz/luaL_loadbuffer/serializer.cc b/test/fuzz/luaL_loadbuffer/serializer.cc
+index b029ddb8ce..72074dc941 100644
+--- a/test/fuzz/luaL_loadbuffer/serializer.cc
++++ b/test/fuzz/luaL_loadbuffer/serializer.cc
+@@ -647,7 +647,7 @@ NESTED_PROTO_TOSTRING(Args, args, FunctionCall)
+ 	case ArgsType::kTableconstructor:
+ 		return TableConstructorToString(args.tableconstructor());
+ 	case ArgsType::kStr:
+-		return "'" + ConvertToStringDefault(args.str()) + "'";
++		return "'" + ConvertToStringDefault(args.str(), true) + "'";
+ 	default:
+ 		/* For more variability. */
+ 		return TableConstructorToString(args.tableconstructor());
+@@ -982,7 +982,7 @@ PROTO_TOSTRING(Expression, expr)
+ 		return std::to_string(number);
+ 	}
+ 	case ExprType::kStr:
+-		return "'" + ConvertToStringDefault(expr.str()) + "'";
++		return "'" + ConvertToStringDefault(expr.str(), true) + "'";
+ 	case ExprType::kEllipsis:
+ 		if (GetContext().vararg_is_possible()) {
+ 			return " ... ";
+@@ -1004,7 +1004,7 @@ PROTO_TOSTRING(Expression, expr)
+ 		 * Arbitrary choice.
+ 		 * TODO: Choose "more interesting" defaults.
+ 		 */
+-		return "'" + ConvertToStringDefault(expr.str()) + "'";
++		return "'" + ConvertToStringDefault(expr.str(), true) + "'";
+ 	}
+ }
+ 
