@@ -22,6 +22,7 @@ option(ENABLE_BONUS_TESTS "Enable bonus tests" OFF)
 option(ENABLE_INTERNAL_TESTS "Enable internal tests" OFF)
 option(ENABLE_LAPI_TESTS "Enable Lua API tests" OFF)
 option(ENABLE_CBMC_PROOFS "Enable CBMC proofs" OFF)
+option(DISABLE_LIBFUZZER_STATIC_LINKAGE "Disable static libFuzzer linkage" OFF)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 set(CMAKE_INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_INCLUDE_PATH})
@@ -37,7 +38,9 @@ endif()
 # resulting in drastically slower execution speeds, crash
 # reproduction failures, or inaccurate coverage reports.
 # Disable libFuzzer static linkage when code coverage is enabled.
-if (ENABLE_LAPI_TESTS AND NOT ENABLE_COV)
+if (ENABLE_LAPI_TESTS AND
+    NOT DISABLE_LIBFUZZER_STATIC_LINKAGE AND
+    NOT ENABLE_COV)
   message(STATUS "libFuzzer static linkage is enabled")
   include(LibFuzzer)
   SetLibFuzzerPath(FUZZER_NO_MAIN_LIBRARY)
