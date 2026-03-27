@@ -64,6 +64,8 @@ is LuaJIT-specific.
 - `ENABLE_INTERNAL_TESTS` enables internal tests.
 - `ENABLE_LAPI_TESTS` enables Lua API tests.
 - `ENABLE_CBMC_PROOFS` enables building CBMC proofs instead tests.
+- `DISABLE_LIBFUZZER_STATIC_LINKAGE` disables linking Lua runtime
+   with libFuzzer statically.
 
 ### Running
 
