@@ -43,7 +43,7 @@ jobs:
         sanitizer: [address, undefined]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup
       - name: Build fuzzing tests (${{ matrix.sanitizer }})
         id: build
