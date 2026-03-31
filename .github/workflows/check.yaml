@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       # https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html#schema
       # A machine-readable JSON schema for the CMakePresets.json format.
@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup luarocks
         run: sudo apt install -y luarocks
