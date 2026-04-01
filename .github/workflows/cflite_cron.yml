@@ -59,7 +59,7 @@ jobs:
         id: run
         uses: google/clusterfuzzlite/actions/run_fuzzers@main
         with:
-          fuzz-seconds: 600
+          fuzz-seconds: 1800
           github-token: ${{ secrets.GITHUB_TOKEN }}
           mode: 'prune'
           output-sarif: true
