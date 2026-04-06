@@ -1,9 +1,7 @@
 name: Testing in ClusterFuzzLite (Scheduled)
 
 on:
-  workflow_dispatch:
-  schedule:
-    - cron: '0 0 * * *'  # Once a day at midnight.
+  push:
 
 permissions: read-all
 
@@ -59,7 +57,7 @@ jobs:
         id: run
         uses: google/clusterfuzzlite/actions/run_fuzzers@main
         with:
-          fuzz-seconds: 1800
+          fuzz-seconds: 3600
           github-token: ${{ secrets.GITHUB_TOKEN }}
           mode: 'prune'
           output-sarif: true
