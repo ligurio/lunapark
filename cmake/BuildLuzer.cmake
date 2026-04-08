@@ -14,8 +14,8 @@ list(APPEND LUZER_CMAKE_FLAGS
     "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
     "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
     "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
-    "-DLUA_INCLUDE_DIR=${LUA_INCLUDE_DIR}"
-    "-DLUA_LIBRARIES=${LUA_LIBRARIES_LOCATION}"
+    "-DCMAKE_LUA_INCLUDE_DIR=${LUA_INCLUDE_DIR}"
+    "-DCMAKE_LUA_LIBRARIES=${LUA_LIBRARIES_LOCATION}"
     "-DOSS_FUZZ=${OSS_FUZZ}"
 )
 # Prevents an error on loading `luzer_impl.so` due to undefined
@@ -35,7 +35,7 @@ endif()
 
 ExternalProject_Add(bundled-luzer
     GIT_REPOSITORY https://github.com/ligurio/luzer
-    GIT_TAG aae4bbde656a9ef464cc1532c92a420a9d438219
+    GIT_TAG ligurio/gh-52-fix-fdp-memleak
     GIT_PROGRESS TRUE
     GIT_SHALLOW FALSE
     SOURCE_DIR ${LUZER_DIR}/source
