@@ -5,6 +5,10 @@
  * Copyright 2022, Tarantool AUTHORS.
  */
 
+#include <fstream>
+#include <string>
+#include <iostream>
+
 extern "C"
 {
 #include "lua.h"
@@ -303,6 +307,11 @@ DEFINE_PROTO_FUZZER(const lua_grammar::Block &message)
 	 */
 	luaJIT_profile_dumpstack(L, "pfFlz", len, &depth);
 #endif /* LUAJIT */
+
+	std::size_t hash = std::hash<std::string>{}(code);
+	std::ofstream out("/tmp/corpus/" + std::to_string(hash) + ".lua");
+	out << code;
+	out.close();
 
 	if (luaL_loadbuffer(L, code.c_str(), code.size(), "fuzz") != LUA_OK) {
 		report_error(L, "luaL_loadbuffer()");
