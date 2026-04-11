@@ -95,15 +95,13 @@ if [[ "$SANITIZER" == "coverage" ]]; then
 fi
 
 LUA_RUNTIME_NAME=luajit
-LUAJIT_PATH=build/luajit-v2.1/source/src/$LUA_RUNTIME_NAME
+LUAJIT_BASE_PATH=$(realpath build/luajit-v2.1/source/src)
+LUAJIT_BIN_PATH=$LUAJIT_BASE_PATH/$LUA_RUNTIME_NAME
 LUA_MODULES_DIR=lua_modules
 
 apt install -y luarocks liblua5.1-0 liblua5.1-0-dev liblua5.1-0-dbg lua5.1
 
-# Required by luzer installed using luarocks.
-export OSS_FUZZ=1
-luarocks install --lua-version 5.1 --server=https://luarocks.org/dev --tree=$LUA_MODULES_DIR luzer
-unset OSS_FUZZ
+luarocks install --lua-version 5.1 --server=https://luarocks.org/dev --tree=$LUA_MODULES_DIR luzer OSS_FUZZ=ON LUA_LIBRARIES=$LUAJIT_BASE_PATH/libluajit.a LUA_INCLUDE_DIR=$LUAJIT_BASE_PATH ENABLE_LUAJIT=ON LUAJIT_FRIENDLY_MODE=ON
 
 cp tests/lapi/lib.lua $OUT
 
@@ -138,5 +136,5 @@ do
   fi
 done
 
-cp $LUAJIT_PATH "$OUT/$LUA_RUNTIME_NAME"
+cp $LUAJIT_BIN_PATH "$OUT/$LUA_RUNTIME_NAME"
 cp -R $LUA_MODULES_DIR "$OUT/"
