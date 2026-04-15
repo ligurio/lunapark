@@ -23,6 +23,11 @@ list(APPEND TEST_ENV
   LD_DYNAMIC_WEAK=1
 )
 
+set(BROKEN_LIBFUZZER_MESSAGE "WARNING: Coverage symbols are being \
+provided by a library other than libFuzzer. This will result in a \
+broken Lua code coverage and severely impacted native extension \
+code coverage.")
+
 function(create_test)
   cmake_parse_arguments(
     FUZZ
@@ -59,6 +64,7 @@ function(create_test)
     LABELS "lapi"
     ENVIRONMENT "${TEST_ENV}"
     DEPENDS ${LUA_EXECUTABLE} ${LUZER_LIBRARY}
+    FAIL_REGULAR_EXPRESSION ${BROKEN_LIBFUZZER_MESSAGE}
   )
 endfunction()
 
