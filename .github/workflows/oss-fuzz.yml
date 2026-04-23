@@ -9,9 +9,7 @@ on:
     paths:
       - '.github/workflows/oss-fuzz.yml'
       - 'proofs'
-      # Lua is not supported by OSS Fuzz,
-      # https://github.com/google/oss-fuzz/issues/13782.
-      - 'tests/capi/**'
+      - 'tests/**'
       - 'cmake/**'
       - 'CMakeLists.txt'
 
