@@ -16,9 +16,6 @@ on:
       - 'cmake/BuildLua.cmake'
       - 'proofs'
       - 'README.md'
-      # Lua is not supported by OSS Fuzz,
-      # https://github.com/google/oss-fuzz/issues/13782.
-      - 'tests/lapi/**'
 
 concurrency:
   # Update of a developer branch cancels the previously scheduled workflow
