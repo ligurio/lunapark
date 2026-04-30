@@ -132,7 +132,7 @@ do
   corpus_dir="corpus/corpus/$test_name_we"
   if [ -e "$corpus_dir" ]; then
     echo "Build corpus '$OUT/"$test_name_we"_seed_corpus.zip' for the test '$test_name_we'"
-    find "$corpus_dir" -mindepth 1 -maxdepth 1 | zip -@ -j $OUT/"$test_name_we"_seed_corpus.zip
+    find "$corpus_dir" -mindepth 1 -maxdepth 1 | zip --quiet -@ -j $OUT/"$test_name_we"_seed_corpus.zip
   fi
 done
 
