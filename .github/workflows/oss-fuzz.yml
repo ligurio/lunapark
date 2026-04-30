@@ -1,17 +1,20 @@
 name: Testing in OSS Fuzz
 
 on:
-  push:
-    branches:
-      - 'master'
-  pull_request:
-    types: [opened, reopened, synchronize]
-    paths:
-      - '.github/workflows/oss-fuzz.yml'
-      - 'proofs'
-      - 'tests/**'
-      - 'cmake/**'
-      - 'CMakeLists.txt'
+  workflow_dispatch:
+  # The workflow is broken, see [1].
+  # 1. https://github.com/google/oss-fuzz/issues/15359
+  # push:
+  #   branches:
+  #     - 'master'
+  # pull_request:
+  #   types: [opened, reopened, synchronize]
+  #   paths:
+  #     - '.github/workflows/oss-fuzz.yml'
+  #     - 'proofs'
+  #     - 'tests/**'
+  #     - 'cmake/**'
+  #     - 'CMakeLists.txt'
 
 concurrency:
   # Update of a developer branch cancels the previously scheduled workflow
