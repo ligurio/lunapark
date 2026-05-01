@@ -31,23 +31,12 @@ extern "C"
 #define UNUSED __attribute__((unused))
 
 struct metrics {
-	/* Per test run. */
 	size_t total_num;
 	size_t total_num_with_errors;
 	size_t jit_trace_record;
 	size_t jit_trace_abort;
-	size_t jit_trace_start;
-	size_t jit_trace_stop;
 	size_t bc_num;
 	size_t texit_num;
-
-	/* Per test sample. */
-	bool is_trace_abort;
-	bool is_trace_start;
-	bool is_trace_stop;
-	bool is_trace_record;
-	bool is_bc;
-	bool is_texit;
 };
 
 static struct metrics metrics;
@@ -77,10 +66,7 @@ jit_attach(lua_State *L, void *func, const char *event)
  */
 UNUSED static int
 record_cb(lua_State *L) {
-	if (!metrics.is_trace_record) {
-		metrics.jit_trace_record++;
-		metrics.is_trace_record = true;
-	}
+	metrics.jit_trace_record++;
 	return 0;
 }
 
@@ -91,10 +77,7 @@ record_cb(lua_State *L) {
  */
 UNUSED static int
 bc_cb(lua_State *L) {
-	if (!metrics.is_bc) {
-		metrics.bc_num++;
-		metrics.is_bc = true;
-	}
+	metrics.bc_num++;
 	return 0;
 }
 
@@ -105,10 +88,7 @@ bc_cb(lua_State *L) {
  */
 UNUSED static int
 texit_cb(lua_State *L) {
-	if (!metrics.is_texit) {
-		metrics.texit_num++;
-		metrics.is_texit = true;
-	}
+	metrics.texit_num++;
 	return 0;
 }
 
@@ -120,23 +100,14 @@ texit_cb(lua_State *L) {
 UNUSED static int
 trace_cb(lua_State *L) {
 	const char *what = lua_tostring(L, 1);
-	if (strcmp(what, "abort") == 0 && !metrics.is_trace_abort) {
+	if (strcmp(what, "abort") == 0) {
 		metrics.jit_trace_abort++;
-		metrics.is_trace_abort = true;
-	}
-	if (strcmp(what, "start") == 0 && !metrics.is_trace_start) {
-		metrics.jit_trace_start++;
-		metrics.is_trace_start = true;
-	}
-	if (strcmp(what, "stop") == 0 && !metrics.is_trace_stop) {
-		metrics.jit_trace_stop++;
-		metrics.is_trace_stop = true;
 	}
 	return 0;
 }
 
 static inline void
-print_metrics(struct metrics *metrics)
+print_metrics(const struct metrics *metrics)
 {
 	if (metrics->total_num == 0)
 		return;
@@ -146,18 +117,14 @@ print_metrics(struct metrics *metrics)
 	PRINT_METRIC("Total number of samples with errors: ",
 		     metrics->total_num_with_errors, metrics->total_num);
 #ifdef LUAJIT
-	PRINT_METRIC("Total number of samples with record traces: ",
-		     metrics->jit_trace_record, metrics->total_num);
-	PRINT_METRIC("Total number of samples with start traces: ",
-		     metrics->jit_trace_start, metrics->total_num);
-	PRINT_METRIC("Total number of samples with stop traces: ",
-		     metrics->jit_trace_stop, metrics->total_num);
-	PRINT_METRIC("Total number of samples with abort traces: ",
-		     metrics->jit_trace_abort, metrics->total_num);
-	PRINT_METRIC("Total number of samples with exit traces: ",
-		     metrics->texit_num, metrics->total_num);
-	PRINT_METRIC("Total number of samples with compiled bc: ",
-		     metrics->bc_num, metrics->total_num);
+	printf("Total number of recorded traces: %zu\n",
+		metrics->jit_trace_record);
+	printf("Total number of aborted traces: %zu\n",
+		metrics->jit_trace_abort);
+	printf("Total number of exited traces: %zu\n",
+		metrics->texit_num);
+	printf("Total number of parsed functions: %zu\n",
+		metrics->bc_num);
 #endif /* LUAJIT */
 }
 
@@ -224,21 +191,9 @@ teardown(void)
 	print_metrics(&metrics);
 }
 
-UNUSED static inline void
-reset_lj_metrics(struct metrics *metrics)
-{
-	metrics->is_trace_start = false;
-	metrics->is_trace_stop = false;
-	metrics->is_trace_abort = false;
-	metrics->is_trace_record = false;
-	metrics->is_bc = false;
-	metrics->is_texit = false;
-}
-
 UNUSED static void
 enable_lj_metrics(lua_State *L, struct metrics *metrics)
 {
-	reset_lj_metrics(metrics);
 	jit_attach(L, (void *)bc_cb, "bc");
 	jit_attach(L, (void *)record_cb, "record");
 	jit_attach(L, (void *)texit_cb, "texit");
