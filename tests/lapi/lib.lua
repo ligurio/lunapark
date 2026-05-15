@@ -60,6 +60,7 @@ local MAX_STR_LEN = 4096
 local function bitwise_op(op_name)
     return function(...)
         local n = select("#", ...)
+        assert(n > 0)
         local chunk
         -- Bitwise exclusive OR and bitwise NOT have the same
         -- operator.
