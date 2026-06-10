@@ -29,8 +29,11 @@ local function TestOneInput(buf, _size)
     local indices = fdp:consume_integers(min_index, count, indices_count)
     for _, idx in ipairs(indices) do
         local old_v = tbl[idx]
+        local old_len = #tbl
         assert(table.remove(tbl, idx) == old_v)
-        assert(tbl[idx] == nil)
+        if old_len > 0 and idx >= 1 and idx <= old_len then
+            assert(#tbl == old_len - 1)
+        end
     end
 end
 
