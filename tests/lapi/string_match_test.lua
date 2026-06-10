@@ -27,7 +27,7 @@ local function TestOneInput(buf, _size)
     -- returns fail. If pattern specifies no captures, then the
     -- whole match is returned.". On practice with empty pattern
     -- `nil` is returned.
-    assert(res == nil or type(res) == "string")
+    assert(res == nil or type(res) == "string" or type(res) == "number")
 end
 
 local args = {
