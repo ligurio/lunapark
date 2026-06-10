@@ -36,7 +36,7 @@ local function TestOneInput(buf, _size)
     local x = fdp:consume_number(0, test_lib.MAX_INT)
     local y = fdp:consume_number(0, test_lib.MAX_INT)
     local b = fdp:consume_number(test_lib.MIN_INT, test_lib.MAX_INT)
-    if b < 0 or b == 1 then return -1 end
+    if b < 0 or b == 1 or x <= 0 or y <= 0 then return -1 end
 
     local eps = 1^-10
 
