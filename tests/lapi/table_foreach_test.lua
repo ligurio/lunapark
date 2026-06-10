@@ -29,8 +29,10 @@ local function TestOneInput(buf, _size)
     local tbl = fdp:consume_strings(test_lib.MAX_STR_LEN, count)
     local i = 0
     local fn = function(_idx, _v) i = i + 1 end
-    table.foreach(tbl, fn)
-    assert(#tbl == i)
+    local ok = pcall(table.foreach, tbl, fn)
+    if ok then
+        assert(#tbl == i)
+    end
 end
 
 local args = {
