@@ -85,7 +85,7 @@ local function io_read(self)
             -- As a special case, `io.read(0)` works as a test for
             -- end of file: It returns an empty string if there is
             -- more to be read or `nil` otherwise.
-            local size = self.fdp:consume_integer(0, test_lib.MAX_INT64)
+            local size = self.fdp:consume_integer(0, MAX_N)
             table.insert(read_formats, size)
         else
             local format = self.fdp:oneof(READ_FORMAT)
