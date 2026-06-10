@@ -22,18 +22,29 @@ local function TestOneInput(buf, _size)
     os.setlocale(test_lib.random_locale(fdp), "all")
     local str = fdp:consume_string(1, test_lib.MAX_STR_LEN)
     local fmt_str = fdp:consume_string(1, test_lib.MAX_STR_LEN)
-    local pos = fdp:consume_integer(0, test_lib.MAX_INT)
 
-    local ok, _ = pcall(string.unpack, fmt_str, str, pos)
+    local ok, _ = pcall(string.unpack, fmt_str, str)
     if not ok then
         return
     end
-    local packed = string.pack(fmt_str, string.unpack(fmt_str, str, pos))
+    local values = { string.unpack(fmt_str, str) }
+    local nvalues = #values
+    -- Last return value is the next position, exclude it.
+    if nvalues <= 1 then
+        return
+    end
+    local packed = string.pack(fmt_str, table.unpack(values, 1, nvalues - 1))
     if #packed == 0 then
         return
     end
-    assert(packed == str)
-    assert(#packed == string.packsize(fmt_str))
+    local values2 = { string.unpack(fmt_str, packed) }
+    for i = 1, nvalues - 1 do
+        assert(values[i] == values2[i])
+    end
+    local ok_size, size = pcall(string.packsize, fmt_str)
+    if ok_size then
+        assert(#packed == size)
+    end
 end
 
 local args = {
