@@ -7,15 +7,18 @@
 name: Testing in ClusterFuzzLite (PR)
 
 on:
-  push:
-    branches:
-      - 'master'
-  pull_request:
-    types: [opened, reopened, synchronize]
-    paths-ignore:
-      - 'cmake/BuildLua.cmake'
-      - 'proofs'
-      - 'README.md'
+  workflow_dispatch:
+  # The workflow is failed because limits for launching have been
+  # exhausted, and the job has been interrupted.
+  # push:
+  #   branches:
+  #     - 'master'
+  # pull_request:
+  #   types: [opened, reopened, synchronize]
+  #   paths-ignore:
+  #     - 'cmake/BuildLua.cmake'
+  #     - 'proofs'
+  #     - 'README.md'
 
 concurrency:
   # Update of a developer branch cancels the previously scheduled workflow
