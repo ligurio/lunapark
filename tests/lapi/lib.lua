@@ -115,6 +115,10 @@ local function is_nan(v)
     return v ~= v
 end
 
+local function is_inf(v)
+    return v == math.huge or v == -math.huge
+end
+
 local function arrays_equal(t1, t2)
     for i = 1, #t1 do
         if t1[i] ~= t2[i] and
@@ -130,6 +134,8 @@ return {
     arrays_equal = arrays_equal,
     bitwise_op = bitwise_op,
     err_handler = err_handler,
+    is_inf = is_inf,
+    is_nan = is_nan,
     lua_current_version_ge_than = lua_current_version_ge_than,
     lua_current_version_lt_than = lua_current_version_lt_than,
     lua_version = lua_version,
