@@ -47,12 +47,24 @@ local function TestOneInput(buf, _size)
     assert(test_lib.approx_equal(
         math.log(x / y, b), math.log(x, b) - math.log(y, b), eps))
     -- Power rule.
-    assert(test_lib.approx_equal(
-        math.log(pow(x, y), b), y * math.log(x, b), eps))
+    local pow_xy = pow(x, y)
+    if (not test_lib.is_nan(pow_xy) and
+        not test_lib.is_inf(pow_xy)) then
+        assert(test_lib.approx_equal(
+            math.log(pow_xy, b), y * math.log(x, b), eps))
+    end
     -- Inverse property of logarithm.
-    assert(test_lib.approx_equal(math.log(pow(b, x), b), x, eps))
+    local pow_bx = pow(b, x)
+    if (not test_lib.is_nan(pow_bx) and
+        not test_lib.is_inf(pow_bx)) then
+        assert(test_lib.approx_equal(math.log(pow_bx, b), x, eps))
+    end
     -- Inverse property of exponent.
-    assert(test_lib.approx_equal(pow(b, math.log(x, b)), x, eps))
+    local pow_b_log = pow(b, math.log(x, b))
+    if (not test_lib.is_nan(pow_b_log) and
+        not test_lib.is_inf(pow_b_log)) then
+        assert(test_lib.approx_equal(pow_b_log, x, eps))
+    end
     -- Zero rule.
     assert(math.log(1, b) == 0)
     -- Identity rule.
