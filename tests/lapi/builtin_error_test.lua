@@ -24,7 +24,13 @@ local function TestOneInput(buf)
     local ok, err = pcall(error, message, level)
     assert(ok == false)
     -- Escape message to avoid error "invalid pattern capture".
-    assert(err:match(escape_pattern(message)) == message)
+    --
+    -- The \0 can mess up the matching, so we only use matching
+    -- for parts of the message:
+    -- | print(("lua\0lua"):match("lua\0lua"))
+    -- | lua
+    local matched = err:match(escape_pattern(message))
+    assert(matched ~= nil)
 end
 
 local args = {
