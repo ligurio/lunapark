@@ -90,15 +90,19 @@ end
 local locales
 
 local function random_locale(fdp)
-    if locales then
-        return fdp:oneof(locales)
+    if locales == nil then
+        locales = {}
+        local ph = io.popen("locale -a")
+        if ph then
+            for locale in ph:read("*a"):gmatch("([^\n]*)\n?") do
+                table.insert(locales, locale)
+            end
+            ph:close()
+        end
+        if #locales == 0 then
+            table.insert(locales, "C")
+        end
     end
-    local locale_it = io.popen("locale -a"):read("*a"):gmatch("([^\n]*)\n?")
-    locales = {}
-    for locale in locale_it do
-        table.insert(locales, locale)
-    end
-
     return fdp:oneof(locales)
 end
 
