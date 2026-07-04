@@ -22,8 +22,11 @@ local function TestOneInput(buf)
     local t1 = fdp:consume_number(MIN_INT, MAX_INT)
     local t2 = fdp:consume_number(MIN_INT, MAX_INT)
     local err_handler = test_lib.err_handler(ignored_msgs)
-    local ok, res = xpcall(os.difftime, err_handler, t1, t2)
-    if not ok then return end
+    local ok, res = pcall(os.difftime, t1, t2)
+    if not ok then
+        err_handler(res)
+        return
+    end
     assert(type(res) == "number")
 end
 

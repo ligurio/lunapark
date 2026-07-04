@@ -105,9 +105,11 @@ end
 local function err_handler(ignored_msgs)
     return function(error_msg)
         for _, ignored_msg in ipairs(ignored_msgs) do
-            local x, _ = string.find(error_msg, ignored_msg)
-            if x then break end
+            if string.find(error_msg, ignored_msg, 1, true) then
+                return
+            end
         end
+        error(error_msg, 2)
     end
 end
 
