@@ -33,8 +33,10 @@ local function TestOneInput(buf)
     local chars = fdp:consume_integers(MIN_INT, MAX_INT, count)
     os.setlocale(test_lib.random_locale(fdp), "all")
     local err_handler = test_lib.err_handler(ignored_msgs)
-    local ok, _ = xpcall(utf8.char, err_handler, unpack(chars))
-    if not ok then return end
+    local ok, err = pcall(utf8.char, unpack(chars))
+    if not ok then
+        err_handler(err)
+    end
 end
 
 local args = {

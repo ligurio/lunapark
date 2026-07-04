@@ -30,8 +30,11 @@ local function TestOneInput(buf)
     local format = fdp:consume_string(test_lib.MAX_STR_LEN)
     local time = fdp:consume_integer(test_lib.MIN_INT, test_lib.MAX_INT)
     local err_handler = test_lib.err_handler(ignored_msgs)
-    local ok, res = xpcall(os.date, err_handler, format, time)
-    if not ok then return end
+    local ok, res = pcall(os.date, format, time)
+    if not ok then
+        err_handler(res)
+        return
+    end
     local type_check = type(res) == "string" or type(res) == "table"
     local undocumented_type_check = type(res) == "number" or res == nil
     assert(type_check or undocumented_type_check)

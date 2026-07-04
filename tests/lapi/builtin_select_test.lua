@@ -62,8 +62,11 @@ local function TestOneInput(buf)
         assert(select(index, unpack(tbl)) == count)
     end
     local err_handler = test_lib.err_handler(ignored_msgs)
-    local ok, res = xpcall(select, err_handler, index, unpack(tbl))
-    if not ok then return end
+    local ok, res = pcall(select, index, unpack(tbl))
+    if not ok then
+        err_handler(res)
+        return
+    end
     -- Don't want to test multiresults.
     if index == "#" then
         assert(res == count)

@@ -31,9 +31,10 @@ local function TestOneInput(buf, _size)
     local n = fdp:consume_integer(1, test_lib.MAX_INT)
     local values = fdp:consume_strings(test_lib.MAX_STR_LEN,  n)
     local err_handler = test_lib.err_handler(ignored_msgs)
-    local ok, _ = xpcall(string.pack, err_handler, fmt_str,
-                         table.unpack(values))
-    if not ok then return end
+    local ok, err = pcall(string.pack, fmt_str, table.unpack(values))
+    if not ok then
+        err_handler(err)
+    end
 end
 
 local args = {

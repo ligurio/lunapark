@@ -64,8 +64,10 @@ local function TestOneInput(buf)
     local i = fdp:consume_integer(MIN_INT, MAX_INT)
     local j = fdp:consume_integer(MIN_INT, MAX_INT)
     local err_handler = test_lib.err_handler(ignored_msgs)
-    local ok, _ = xpcall(unpack, err_handler, str_chars, i, j)
-    if not ok then return end
+    local ok, err = pcall(unpack, str_chars, i, j)
+    if not ok then
+        err_handler(err)
+    end
 end
 
 local args = {
