@@ -29,7 +29,9 @@ function(SetLibFuzzerPath outvar)
     message(FATAL_ERROR "Unsupported system: ${CMAKE_SYSTEM_NAME}")
   endif()
 
-  execute_process(COMMAND ${CMAKE_C_COMPILER} "-print-file-name=${lib_name}"
+  string(REPLACE " " ";" CMAKE_C_FLAGS_LIST "${CMAKE_C_FLAGS}")
+  execute_process(
+    COMMAND ${CMAKE_C_COMPILER} ${CMAKE_C_FLAGS_LIST} "-print-file-name=${lib_name}"
     RESULT_VARIABLE CMD_ERROR
     OUTPUT_VARIABLE CMD_OUTPUT
     OUTPUT_STRIP_TRAILING_WHITESPACE
