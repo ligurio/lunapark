@@ -57,7 +57,7 @@ local function TestOneInput(buf)
     end
 
     local index = fdp:consume_boolean() and "#" or
-                  fdp:consume_integer(0, MAX_INT)
+                  fdp:consume_integer(1, count)
     if index == "#" then
         assert(select(index, unpack(tbl)) == count)
     end
