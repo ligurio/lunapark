@@ -62,7 +62,7 @@ local function random_objects(self)
         objects = self.fdp:consume_numbers(
             test_lib.MIN_INT64, test_lib.MAX_INT64, count)
     else
-        assert(nil, "object type is unsupported")
+        error("object type is unsupported")
     end
 
     return objects

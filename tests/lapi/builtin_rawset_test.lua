@@ -34,7 +34,7 @@ local function TestOneInput(buf)
 
     local mt = {
         __newindex = function(_table, _key, _value)
-            assert(nil, "assertion is not reachable")
+            error("assertion is not reachable")
         end,
     }
     setmetatable(tbl, mt)
