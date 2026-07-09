@@ -26,7 +26,7 @@ local function random_table(fdp, n)
     elseif item_type == "string" then
         tbl = fdp:consume_strings(test_lib.MAX_STR_LEN, count)
     else
-        assert("Unsupported type")
+        error("Unsupported type")
     end
     return tbl
 end

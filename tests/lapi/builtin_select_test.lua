@@ -37,7 +37,7 @@ local function random_value(fdp)
         local MAX_N = 10
         item = fdp:consume_numbers(MIN_INT, MAX_INT, MAX_N)
     else
-        assert("Unsupported type")
+        error("Unsupported type")
     end
     return item
 end

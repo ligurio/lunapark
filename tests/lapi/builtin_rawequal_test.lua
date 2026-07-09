@@ -43,7 +43,7 @@ local function random_pair_values(fdp)
         item1 = fdp:consume_numbers(MIN_INT, MAX_INT, 10)
         item2 = fdp:consume_numbers(MIN_INT, MAX_INT, 10)
     else
-        assert("Unsupported type")
+        error("Unsupported type")
     end
     return item1, item2
 end
@@ -52,16 +52,16 @@ local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
     local v1, v2 = random_pair_values(fdp)
     local comp1 = rawequal(v1, v2)
-    assert(type(comp1 == "boolean"))
+    assert(type(comp1) == "boolean")
     local mt = {
         __eq = function(_op1, _op2)
-            assert(nil, "assertion is not reachable")
+            error("assertion is not reachable")
         end,
     }
     debug.setmetatable(v1, mt)
     debug.setmetatable(v2, mt)
     local comp2 = rawequal(v1, v2)
-    assert(type(comp2 == "boolean"))
+    assert(type(comp2) == "boolean")
     assert(comp1 == comp2)
 end
 
