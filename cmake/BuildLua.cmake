@@ -62,7 +62,7 @@ macro(build_lua LUA_VERSION)
         # `io.popen()` is not supported by default, it is enabled
         # by `LUA_USE_POSIX` flag. Required by a function `random_locale()`.
         AppendFlags(CFLAGS -DLUA_USE_POSIX)
-        AppendFlags(LDFLAGS -lstdc++)
+        AppendFlags(LDFLAGS -static-libstdc++)
     endif()
 
     include(ExternalProject)
