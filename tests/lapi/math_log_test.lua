@@ -31,6 +31,7 @@ end
 
 local function TestOneInput(buf, _size)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     -- The natural logarithm (base e) of x. If x is ±0,
     -- returns -Infinity. If x < 0, returns NaN.
     local x = fdp:consume_number(0, test_lib.MAX_INT)

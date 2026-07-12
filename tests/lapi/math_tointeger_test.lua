@@ -22,6 +22,7 @@ end
 
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     local max_len = fdp:consume_integer(0, test_lib.MAX_INT)
     local x = fdp:consume_string(max_len)
     local res = math.tointeger(x)

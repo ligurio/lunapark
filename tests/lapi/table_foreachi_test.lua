@@ -19,6 +19,7 @@ end
 
 local function TestOneInput(buf, _size)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     local count = fdp:consume_integer(1, test_lib.MAX_INT)
     local tbl = fdp:consume_strings(test_lib.MAX_STR_LEN, count)
     local i = 0

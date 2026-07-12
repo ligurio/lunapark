@@ -13,6 +13,7 @@ local test_lib = require("lib")
 
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
 
     -- Since Lua 5.5 conversion float to string ensures that, for
     -- any float f, `tonumber(tostring(f)) == f`, but still

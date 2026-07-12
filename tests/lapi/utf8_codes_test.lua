@@ -27,6 +27,7 @@ local ignored_msgs = {
 
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     local max_len = fdp:consume_integer(1, MAX_INT)
     local s = fdp:consume_string(max_len)
     local lax = fdp:consume_boolean()

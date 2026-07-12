@@ -226,6 +226,7 @@ end
 
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     local nops = fdp:consume_integer(1, MAX_INT)
     for _ = 1, nops do
         gc_random_action(fdp)

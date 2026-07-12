@@ -65,6 +65,7 @@ local specifiers = {
 
 local function TestOneInput(buf, _size)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     local spec = fdp:oneof(specifiers)
     local format_string = ("%%%s"):format(spec)
     local str = fdp:consume_string(test_lib.MAX_STR_LEN)

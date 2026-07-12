@@ -27,6 +27,7 @@ local ignored_msgs = {
 
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     -- Limit count to prevent error "too many results to unpack".
     local MAX_N = 1000
     local count = fdp:consume_integer(1, MAX_N)

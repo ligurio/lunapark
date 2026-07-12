@@ -29,6 +29,7 @@ end
 
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     -- Beware, huge number triggers OOM or table overflow.
     local MAX_N = 1000
     local narray = fdp:consume_integer(0, MAX_N)

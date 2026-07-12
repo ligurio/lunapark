@@ -16,6 +16,7 @@ local test_lib = require("lib")
 
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     local x = fdp:consume_number(-1, 1)
     local y = math.asin(x)
     assert(type(y) == "number")

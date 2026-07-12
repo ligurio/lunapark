@@ -51,6 +51,7 @@ local MAX_BASE = 36
 
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     local base = fdp:consume_integer(MIN_BASE, MAX_BASE)
     local e = fdp:consume_string(test_lib.MAX_STR_LEN)
     local res = tonumber(e, base)

@@ -44,6 +44,7 @@ end
 
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     local chunk = fdp:consume_string(test_lib.MAX_STR_LEN)
     -- LuaJIT ASSERT lj_bcread.c:123: bcread_byte: buffer read
     -- overflow.

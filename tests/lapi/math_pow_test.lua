@@ -36,6 +36,7 @@ end
 
 local function TestOneInput(buf, _size)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     local x = fdp:consume_number(test_lib.MIN_INT, test_lib.MAX_INT)
     local y = fdp:consume_number(test_lib.MIN_INT, test_lib.MAX_INT)
     local res = pow(x, y)

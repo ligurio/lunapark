@@ -15,6 +15,7 @@ local MAX_INT = test_lib.MAX_INT
 
 local function TestOneInput(buf, _size)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     local str = fdp:consume_string(test_lib.MAX_STR_LEN)
     local tbl = {}
     str:gsub(".", function(c)

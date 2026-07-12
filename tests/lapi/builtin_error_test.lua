@@ -18,6 +18,7 @@ end
 
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     local level = fdp:consume_integer(0, MAX_INT)
     local message_len = fdp:consume_integer(0, MAX_INT)
     local message = fdp:consume_string(message_len)

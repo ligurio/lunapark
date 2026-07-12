@@ -169,6 +169,7 @@ end
 local function TestOneInput(buf, _size)
     CORO_OBJECTS = {}
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     local MAX_N = 1000
     local coro_max_number = fdp:consume_integer(1, MAX_N)
     local co = coroutine.create(coro_function)

@@ -29,6 +29,7 @@ end
 
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     local level = fdp:consume_integer(0, test_lib.MAX_INT)
     local fenv, err = pcall(getfenv, level)
     if err ~= nil then

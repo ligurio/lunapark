@@ -29,6 +29,7 @@ local table_clear = require("table.clear")
 
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     local count = fdp:consume_integer(0, test_lib.MAX_INT64)
     local tbl = fdp:consume_strings(test_lib.MAX_STR_LEN, count)
     table_clear(tbl)

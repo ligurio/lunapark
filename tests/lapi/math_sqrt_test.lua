@@ -25,6 +25,7 @@ local test_lib = require("lib")
 
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     local x = fdp:consume_number(0, test_lib.MAX_INT)
     assert(type(x) == "number")
     -- Note, `math.sqrt(x)` and `x^0.5` are not interchangeable,

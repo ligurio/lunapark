@@ -50,6 +50,7 @@ end
 
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     local v1, v2 = random_pair_values(fdp)
     local comp1 = rawequal(v1, v2)
     assert(type(comp1) == "boolean")
