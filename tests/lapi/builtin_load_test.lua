@@ -41,6 +41,7 @@ local test_lib = require("lib")
 
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     ---@type "t" | "b" | "bt" | nil
     local mode = fdp:oneof({"t", "b"})
     -- LuaJIT ASSERT lj_bcread.c:123: bcread_byte: buffer read overflow.

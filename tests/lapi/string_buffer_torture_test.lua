@@ -272,6 +272,7 @@ end
 
 local function TestOneInput(buf, _size)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     local nops = fdp:consume_number(1, MAX_N)
     local b = buffer_new(fdp)
     for _ = 1, nops do

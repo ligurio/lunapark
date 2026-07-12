@@ -19,6 +19,7 @@ local ignored_msgs = {
 
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     local t1 = fdp:consume_number(MIN_INT, MAX_INT)
     local t2 = fdp:consume_number(MIN_INT, MAX_INT)
     local err_handler = test_lib.err_handler(ignored_msgs)

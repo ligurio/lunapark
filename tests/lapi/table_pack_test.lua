@@ -20,6 +20,7 @@ local unpack = unpack or table.unpack
 
 local function TestOneInput(buf, _size)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     -- Beware, huge number triggers 'too many results to unpack'.
     local MAX_N = 1000
     local count = fdp:consume_integer(1, MAX_N)

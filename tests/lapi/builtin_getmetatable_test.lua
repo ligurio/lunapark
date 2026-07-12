@@ -17,6 +17,7 @@ local test_lib = require("lib")
 local function TestOneInput(buf)
     local tbl = {}
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     -- Build a random table and set a known key to it to check
     -- it's presence in metatable.
     local MAX_N = 100

@@ -117,6 +117,66 @@ local function err_handler(ignored_msgs)
     end
 end
 
+local LJ_OPT = {
+    "abc",
+    "cse",
+    "dce",
+    "dse",
+    "fma",
+    "fold",
+    "fuse",
+    "fwd",
+    "loop",
+    "narrow",
+    "sink",
+}
+
+-- The table contains LuaJIT parameters with desired ranges,
+-- see https://luajit.org/running.html#foot.
+local LJ_PARAM = {
+    ["callunroll"] = { 1, 3 },
+    ["hotexit"] = { 1, 56 },
+    ["hotloop"] = { 1, 56 },
+    ["instunroll"] = { 1, 4 },
+    ["loopunroll"] = { 1, 15 },
+    ["maxirconst"] = { 1, 500 },
+    ["maxmcode"] = { 1, 2048 },
+    ["maxrecord"] = { 1, 4000 },
+    ["maxside"] = { 1, 100 },
+    ["maxsnap"] = { 1, 500 },
+    ["maxtrace"]  = { 1, 1000 },
+    ["recunroll"] = { 1, 2 },
+    ["sizemcode"] = { 1, 64 },
+    ["tryside"] = { 1, 4 },
+}
+
+local function random_lj_settings(fdp)
+    local settings = {}
+    for _, opt in ipairs(LJ_OPT) do
+        local enabled = fdp:consume_boolean()
+        table.insert(settings, enabled and opt or "-" .. opt)
+    end
+
+    for param, minmax in pairs(LJ_PARAM) do
+        local min, max = unpack(minmax)
+        local param_str = ("%s=%d"):format(param, fdp:consume_integer(min, max))
+        table.insert(settings, param_str)
+    end
+
+    jit.opt.start(unpack(settings))
+end
+
+local function random_misc_settings(fdp)
+    if lua_version() == "LuaJIT" then
+        local use_jit = fdp:consume_boolean()
+        if not use_jit then
+            jit.off()
+            return
+        end
+        random_lj_settings(fdp)
+    end
+end
+
 local function is_nan(v)
     return v ~= v
 end
@@ -154,4 +214,5 @@ return {
 
     -- FDP.
     random_locale = random_locale,
+    random_misc_settings = random_misc_settings,
 }

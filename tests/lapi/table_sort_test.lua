@@ -33,6 +33,7 @@ end
 
 local function TestOneInput(buf, _size)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     -- Beware, huge length leads to slow units.
     local MAX_N = 1000
     local t = random_table(fdp, MAX_N)

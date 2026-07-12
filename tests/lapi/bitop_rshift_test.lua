@@ -23,6 +23,7 @@ end
 
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     local MAX_INT = test_lib.MAX_INT
     local x = fdp:consume_integer(0, MAX_INT)
     local n = fdp:consume_integer(1, 32)

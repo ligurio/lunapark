@@ -26,6 +26,7 @@ local ignored_msgs = {
 
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     os.setlocale(test_lib.random_locale(fdp), "all")
     local format = fdp:consume_string(test_lib.MAX_STR_LEN)
     local time = fdp:consume_integer(test_lib.MIN_INT, test_lib.MAX_INT)

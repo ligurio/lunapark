@@ -28,7 +28,9 @@ local luzer = require("luzer")
 local test_lib = require("lib")
 
 local function TestOneInput(buf)
-    local chunk = buf
+    local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
+    local chunk = fdp:remaining_bytes()
     if test_lib.lua_version() == "LuaJIT" then
         -- LuaJIT ASSERT lj_bcread.c:123: bcread_byte: buffer read overflow.
         local pattern = "[^%z\1-\127][\128-\255][\192-\255][\128-\191]"

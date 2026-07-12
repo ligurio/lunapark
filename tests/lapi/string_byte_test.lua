@@ -16,6 +16,7 @@ local test_lib = require("lib")
 
 local function TestOneInput(buf, _size)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     os.setlocale(test_lib.random_locale(fdp), "all")
     local str = fdp:consume_string(test_lib.MAX_STR_LEN)
     local i = fdp:consume_integer(test_lib.MIN_INT, test_lib.MAX_INT)

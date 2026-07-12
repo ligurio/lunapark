@@ -16,6 +16,7 @@ local unpack = unpack or table.unpack
 
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
 
     local str = fdp:consume_string(test_lib.MAX_STR_LEN)
     if str == nil then return -1 end

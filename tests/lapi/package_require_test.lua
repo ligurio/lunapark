@@ -31,6 +31,7 @@ local function TestOneInput(buf)
     local old_cpath = package.cpath
 
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     local path = build_path(fdp)
     package.path = path
     local cpath = build_path(fdp)

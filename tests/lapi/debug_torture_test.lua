@@ -159,6 +159,7 @@ end
 
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
 
     -- Generate a random 'what'.
     local what_modes_array = {}

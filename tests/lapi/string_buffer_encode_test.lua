@@ -35,6 +35,7 @@ end
 
 local function TestOneInput(buf, _size)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     local obj = fdp:consume_string(test_lib.MAX_STR_LEN)
     local buf_size = fdp:consume_integer(1, test_lib.MAX_STR_LEN)
     local b = string_buf.new(buf_size)

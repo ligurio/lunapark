@@ -9,9 +9,12 @@ Synopsis: os.getenv(varname)
 ]]
 
 local luzer = require("luzer")
+local test_lib = require("lib")
 
 local function TestOneInput(buf)
-    local v = os.getenv(buf)
+    local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
+    local v = os.getenv(fdp:remaining_bytes())
     assert(type(v) == "string" or v == nil)
 end
 

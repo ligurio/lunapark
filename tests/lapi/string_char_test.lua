@@ -21,6 +21,7 @@ local unpack = unpack or table.unpack
 
 local function TestOneInput(buf, _size)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     os.setlocale(test_lib.random_locale(fdp), "all")
     -- `n` must be less than UINT_MAX and there are at least extra
     -- free stack slots in the stack, otherwise an error

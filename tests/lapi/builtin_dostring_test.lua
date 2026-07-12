@@ -12,6 +12,7 @@ local MAX_INT = test_lib.MAX_INT
 
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     local max_len = fdp:consume_integer(0, MAX_INT)
     local str = fdp:consume_string(max_len)
     pcall(loadstring, str)

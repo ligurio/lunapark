@@ -18,6 +18,7 @@ local MIN_INT = test_lib.MIN_INT
 
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
+    test_lib.random_misc_settings(fdp)
     local MAX_N = 1000
     local count = fdp:consume_integer(0, MAX_N)
     local tbl = fdp:consume_integers(MIN_INT, MAX_INT, count)
