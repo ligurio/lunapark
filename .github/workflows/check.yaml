@@ -46,3 +46,19 @@ jobs:
 
       - name: Run luacheck
         run: luacheck .
+
+  emmylua_check:
+    if: |
+      github.event_name == 'push' ||
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name != github.repository
+
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: ./.github/actions/setup-emmylua-analyzer
+
+      - name: Run emmylua_check
+        run: emmylua_check tests --config .emmyrc.json
