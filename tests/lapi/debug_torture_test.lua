@@ -186,6 +186,9 @@ local function TestOneInput(buf)
     pcall(chunk)
 
     -- Turn off the hook.
+    -- The warning is suppressed, see
+    -- https://github.com/EmmyLuaLs/emmylua-analyzer-rust/issues/1176.
+    ---@diagnostic disable-next-line: missing-parameter
     debug.sethook()
 end
 
