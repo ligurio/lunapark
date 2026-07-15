@@ -10,7 +10,6 @@
     "disable": [
       "access-invisible",
       "deprecated",
-      "missing-parameter",
       "need-check-nil",
       "param-type-mismatch",
       "preferred-local-alias",
