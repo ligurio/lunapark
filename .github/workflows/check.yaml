@@ -2,13 +2,7 @@ name: Static analysis
 
 on:
   push:
-    branches:
-      - 'master'
   pull_request:
-    types: [opened, reopened, synchronize]
-    paths:
-      - '**.lua'
-      - 'CMakePresets.json'
 
 jobs:
   cmake-presets:
