@@ -41,13 +41,16 @@ local test_lib = require("lib")
 
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
+    ---@type "t" | "b" | "bt" | nil
     local mode = fdp:oneof({"t", "b"})
     -- LuaJIT ASSERT lj_bcread.c:123: bcread_byte: buffer read overflow.
     if test_lib.lua_version() == "LuaJIT" then
         mode = "t"
     end
     local func = load(buf, "luzer", mode)
-    pcall(func)
+    if type(func) == "function" then
+        pcall(func)
+    end
 end
 
 local args = {

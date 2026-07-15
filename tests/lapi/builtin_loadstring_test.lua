@@ -35,7 +35,7 @@ local function TestOneInput(buf)
         chunk = string.gsub(chunk, pattern, "")
     end
     local ok, res = pcall(loadstring, chunk)
-    if ok then
+    if ok and type(res) == "function" then
         pcall(res)
     end
 end

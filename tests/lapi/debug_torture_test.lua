@@ -180,6 +180,9 @@ local function TestOneInput(buf)
     end
 
     -- Turn on the hook.
+    -- The warnings are suppressed, see
+    -- https://github.com/EmmyLuaLs/emmylua-analyzer-rust/issues/1176.
+    ---@diagnostic disable-next-line: param-type-mismatch
     debug.sethook(debug_hook, table.concat(mask), 1)
 
     local code = fdp:consume_string(test_lib.MAX_STR_LEN)

@@ -20,6 +20,7 @@ if test_lib.lua_version() == "LuaJIT" then
 elseif test_lib.lua_current_version_ge_than(5, 5) then
     -- New function 'table.create()' in PUC Rio Lua,
     -- https://github.com/lua/lua/commit/3e9dbe143d3338f5f13a5e421ea593adff482da0
+    ---@diagnostic disable-next-line: access-invisible
     table_create = table.create
 else
     print("Unsupported version.")
