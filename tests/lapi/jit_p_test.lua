@@ -39,7 +39,7 @@ local function sysprof_dumpstack(fdp)
     local fmt = fdp:oneof(DUMPSTACK_FMT)
     local depth = fdp:consume_integer(MIN_INT, MAX_INT)
     local dump = sysprof.dumpstack(fmt, depth)
-    assert(dump)
+    assert(dump ~= 0)
 end
 
 local function TestOneInput(buf)
