@@ -183,6 +183,7 @@ local function TestOneInput(buf)
     -- The warnings are suppressed, see
     -- https://github.com/EmmyLuaLs/emmylua-analyzer-rust/issues/1176.
     ---@diagnostic disable-next-line: param-type-mismatch
+    ---@diagnostic disable-next-line: redundant-parameter
     debug.sethook(debug_hook, table.concat(mask), 1)
 
     local code = fdp:consume_string(test_lib.MAX_STR_LEN)

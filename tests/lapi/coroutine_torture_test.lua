@@ -158,7 +158,7 @@ local function coro_random_action(fdp, coro_max_number)
     end
 end
 
-coro_function = function(fdp, coro_max_number)
+function coro_function(fdp, coro_max_number)
     local MAX_N = 1000
     local iter = fdp:consume_integer(1, MAX_N)
     for _ = 1, iter do
