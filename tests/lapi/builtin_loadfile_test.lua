@@ -14,6 +14,7 @@ local test_lib = require("lib")
 local function TestOneInput(buf)
     local chunk_filename = os.tmpname()
     local fh = io.open(chunk_filename, "w")
+    assert(fh ~= nil)
     local chunk = buf
     if test_lib.lua_version() == "LuaJIT" then
         -- LuaJIT ASSERT lj_bcread.c:123: bcread_byte: buffer read overflow.
