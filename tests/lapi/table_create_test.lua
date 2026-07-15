@@ -31,7 +31,8 @@ local function TestOneInput(buf)
     local MAX_N = 1000
     local narray = fdp:consume_integer(0, MAX_N)
     local nhash = fdp:consume_integer(0, MAX_N)
-    local _ = table_create(narray, nhash) -- luacheck: no unused
+    local tbl = table_create(narray, nhash)
+    assert(tbl ~= nil and type(tbl) == "table")
 end
 
 local args = {
