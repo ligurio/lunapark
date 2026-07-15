@@ -145,6 +145,7 @@ local function coro_random_action(fdp, coro_max_number)
     elseif action == "close" then
         coroutine.close(co)
     elseif action == "yield" and coroutine.isyieldable(co) then
+        ---@diagnostic disable-next-line: await-in-sync
         coroutine.yield(co)
     elseif action == "resume" then
         coroutine.resume(co)
