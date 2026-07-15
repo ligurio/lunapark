@@ -65,7 +65,7 @@ local hook_mask = {
 local loadstring = type(loadstring) == "function" and loadstring or load
 
 local what_modes_str
-local what_modes_map
+local what_modes_map = {}
 
 local function check_getinfo(ar)
     if what_modes_map.S then
@@ -161,7 +161,6 @@ local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
 
     -- Generate a random 'what'.
-    what_modes_map = {}
     local what_modes_array = {}
     local count_modes = fdp:consume_integer(0, #what)
     for _ = 0, count_modes do

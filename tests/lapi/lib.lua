@@ -93,7 +93,7 @@ local function random_locale(fdp)
     if locales == nil then
         locales = {}
         local ph = io.popen("locale -a")
-        if ph then
+        if ph ~= nil then
             for locale in ph:read("*a"):gmatch("([^\n]*)\n?") do
                 table.insert(locales, locale)
             end

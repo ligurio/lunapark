@@ -31,7 +31,7 @@ local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
     local level = fdp:consume_integer(0, test_lib.MAX_INT)
     local fenv, err = pcall(getfenv, level)
-    if err then
+    if err ~= nil then
         return -1
     end
     assert(type(fenv) == "table", "fenv must be a table")
