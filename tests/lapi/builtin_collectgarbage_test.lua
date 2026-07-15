@@ -11,8 +11,6 @@ Synopsis: collectgarbage([opt [, arg]])
 local luzer = require("luzer")
 local test_lib = require("lib")
 
-local unpack = unpack or table.unpack
-
 local MAX_INT = test_lib.MAX_INT
 
 local WEAK_MODES = { "k", "v", "kv" }
@@ -47,53 +45,6 @@ end
 local function gc_isrunning(_fdp)
     local res = collectgarbage("isrunning")
     assert(type(res) == "boolean")
-end
-
--- This option can be followed by three numbers: the
--- garbage-collector pause, the step multiplier, and the step
--- size.
-local function gc_incremental(fdp)
-    local args = fdp:consume_integers(0, MAX_INT, 3)
-    local res = collectgarbage("incremental", unpack(args))
-    assert(type(res) == "string")
-end
-
--- This option can be followed by two numbers: the
--- garbage-collector minor multiplier and the major multiplier.
-local function gc_generational(fdp)
-    local args = fdp:consume_integers(0, MAX_INT, 2)
-    local res = collectgarbage("generational", unpack(args))
-    assert(type(res) == "string")
-end
-
-local GC_PARAM = {
-    "minormul",
-    "majorminor",
-    "minormajor",
-    "pause",
-    "stepmul",
-    "stepsize",
-}
-
-local function gc_param(fdp)
-    local param_name = fdp:oneof(GC_PARAM)
-    local MIN_PARAM = 0
-    local MAX_PARAM = 100000
-    local param_value = fdp:consume_integer(MIN_PARAM, MAX_PARAM)
-    local res = collectgarbage("param", param_name, param_value)
-    assert(type(res) == "number")
-end
-
-local function gc_setpause(fdp)
-    local pause = fdp:consume_integer(0, 1000)
-    local res = collectgarbage("setpause", pause)
-    assert(type(res) == "number")
-end
-
-local function gc_setstepmul(fdp)
-    local step_multiplier = fdp:consume_integer(0, 1000)
-    local res = collectgarbage("setstepmul", step_multiplier)
-    assert(type(res) == "number")
 end
 
 -- Create large allocations to raise GC threshold, then nil them
@@ -201,27 +152,13 @@ local GC_ACTIONS = {
     workload_weak_rehash,
 }
 if test_lib.lua_version() == "LuaJIT" then
-    table.insert(GC_ACTIONS, gc_setpause)
-    table.insert(GC_ACTIONS, gc_setstepmul)
+    table.insert(GC_ACTIONS, test_lib.gc_setpause)
+    table.insert(GC_ACTIONS, test_lib.gc_setstepmul)
 else
-    table.insert(GC_ACTIONS, gc_param)
-    table.insert(GC_ACTIONS, gc_generational)
-    table.insert(GC_ACTIONS, gc_incremental)
+    table.insert(GC_ACTIONS, test_lib.gc_param)
+    table.insert(GC_ACTIONS, test_lib.gc_generational)
+    table.insert(GC_ACTIONS, test_lib.gc_incremental)
     table.insert(GC_ACTIONS, gc_isrunning)
-end
-
-local ignored_msgs = {
-    "invalid format option",
-    "invalid option",
-    "bad argument",
-    "cannot resume",
-}
-
-local function gc_random_action(fdp)
-    local gc_action = fdp:oneof(GC_ACTIONS)
-    local err_handler = test_lib.err_handler(ignored_msgs)
-    local ok, err = pcall(gc_action, fdp)
-    if not ok then err_handler(err) end
 end
 
 local function TestOneInput(buf)
@@ -229,7 +166,7 @@ local function TestOneInput(buf)
     test_lib.random_misc_settings(fdp)
     local nops = fdp:consume_integer(1, MAX_INT)
     for _ = 1, nops do
-        gc_random_action(fdp)
+        test_lib.gc_random_action(fdp, GC_ACTIONS)
     end
 end
 

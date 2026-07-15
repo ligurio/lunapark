@@ -5,6 +5,8 @@ Copyright (c) 2023-2026, Sergey Bronnikov.
 Test helpers.
 ]]
 
+local unpack = unpack or table.unpack
+
 -- The function determines a Lua version.
 local function lua_version()
     local major, minor = _VERSION:match("([%d]+)%.(%d+)")
@@ -117,6 +119,77 @@ local function err_handler(ignored_msgs)
     end
 end
 
+local function gc_setpause(fdp)
+    local pause = fdp:consume_integer(0, 1000)
+    local res = collectgarbage("setpause", pause)
+    assert(type(res) == "number")
+end
+
+local function gc_setstepmul(fdp)
+    local step_multiplier = fdp:consume_integer(0, 1000)
+    local res = collectgarbage("setstepmul", step_multiplier)
+    assert(type(res) == "number")
+end
+
+local GC_PARAM = {
+    "minormul",
+    "majorminor",
+    "minormajor",
+    "pause",
+    "stepmul",
+    "stepsize",
+}
+
+local function gc_param(fdp)
+    local param_name = fdp:oneof(GC_PARAM)
+    local MIN_PARAM = 0
+    local MAX_PARAM = 100000
+    local param_value = fdp:consume_integer(MIN_PARAM, MAX_PARAM)
+    local res = collectgarbage("param", param_name, param_value)
+    assert(type(res) == "number")
+end
+
+-- This option can be followed by two numbers: the
+-- garbage-collector minor multiplier and the major multiplier.
+local function gc_generational(fdp)
+    local args = fdp:consume_integers(0, MAX_INT, 2)
+    local res = collectgarbage("generational", unpack(args))
+    assert(type(res) == "string")
+end
+
+-- This option can be followed by three numbers: the
+-- garbage-collector pause, the step multiplier, and the step
+-- size.
+local function gc_incremental(fdp)
+    local args = fdp:consume_integers(0, MAX_INT, 3)
+    local res = collectgarbage("incremental", unpack(args))
+    assert(type(res) == "string")
+end
+
+local gc_ignored_msgs = {
+    "invalid format option",
+    "invalid option",
+    "bad argument",
+    "cannot resume",
+}
+
+local function gc_random_action(fdp, gc_actions)
+    local gc_action = fdp:oneof(gc_actions)
+    local handler = err_handler(gc_ignored_msgs)
+    local ok, err = pcall(gc_action, fdp)
+    if not ok then handler(err) end
+end
+
+local GC_ACTIONS = {}
+if lua_version() == "LuaJIT" then
+    table.insert(GC_ACTIONS, gc_setpause)
+    table.insert(GC_ACTIONS, gc_setstepmul)
+else
+    table.insert(GC_ACTIONS, gc_param)
+    table.insert(GC_ACTIONS, gc_generational)
+    table.insert(GC_ACTIONS, gc_incremental)
+end
+
 local LJ_OPT = {
     "abc",
     "cse",
@@ -167,6 +240,7 @@ local function random_lj_settings(fdp)
 end
 
 local function random_misc_settings(fdp)
+    gc_random_action(fdp, GC_ACTIONS)
     if lua_version() == "LuaJIT" then
         local use_jit = fdp:consume_boolean()
         if not use_jit then
@@ -213,6 +287,12 @@ return {
     MAX_STR_LEN = MAX_STR_LEN,
 
     -- FDP.
+    gc_generational = gc_generational,
+    gc_incremental = gc_incremental,
+    gc_param = gc_param,
+    gc_random_action = gc_random_action,
+    gc_setpause = gc_setpause,
+    gc_setstepmul = gc_setstepmul,
     random_locale = random_locale,
     random_misc_settings = random_misc_settings,
 }
