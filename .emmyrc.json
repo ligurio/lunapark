@@ -9,7 +9,6 @@
   "diagnostics": {
     "disable": [
       "access-invisible",
-      "await-in-sync",
       "deprecated",
       "inject-field",
       "missing-parameter",
