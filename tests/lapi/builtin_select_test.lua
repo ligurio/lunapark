@@ -56,6 +56,7 @@ local function TestOneInput(buf)
         table.insert(tbl, random_value(fdp))
     end
 
+    ---@type "#" | integer
     local index = fdp:consume_boolean() and "#" or
                   fdp:consume_integer(1, count)
     if index == "#" then
