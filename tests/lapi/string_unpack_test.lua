@@ -33,6 +33,7 @@ local function TestOneInput(buf, _size)
     if nvalues <= 1 then
         return
     end
+    ---@diagnostic disable-next-line: param-type-mismatch
     local packed = string.pack(fmt_str, table.unpack(values, 1, nvalues - 1))
     if #packed == 0 then
         return

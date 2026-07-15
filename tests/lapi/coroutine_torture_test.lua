@@ -95,6 +95,7 @@ if test_lib.lua_current_version_ge_than(5, 4) then
 end
 
 -- Forward declaration.
+---@type fun()
 local coro_function
 
 local function hook_func(_event)

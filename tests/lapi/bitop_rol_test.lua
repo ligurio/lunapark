@@ -23,6 +23,7 @@ local function TestOneInput(buf)
     local MAX_INT = test_lib.MAX_INT
     local MIN_INT = test_lib.MIN_INT
     local x = fdp:consume_integer(MIN_INT, MAX_INT)
+    ---@type integer
     local n = fdp:consume_integer(MIN_INT, MAX_INT)
     local res = rol(x, n)
     assert(type(res) == "number")

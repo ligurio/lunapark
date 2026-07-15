@@ -48,7 +48,11 @@ local function TestOneInput(buf)
     -- LuaJIT ASSERT lj_bcread.c:123: bcread_byte: buffer read
     -- overflow.
     local func = load(chunk, "luzer", "t")
+    if type(func) ~= "function" then
+        return
+    end
 
+    ---@type string
     local sysprof_option = fdp:oneof(SYSPROF_OPTIONS)
     if sysprof_option == "i" then
         sysprof_option = ("i%d"):format(SYSPROF_DEFAULT_INTERVAL)
