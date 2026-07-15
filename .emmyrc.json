@@ -10,7 +10,6 @@
     "disable": [
       "access-invisible",
       "deprecated",
-      "unnecessary-assert",
       "unnecessary-if",
       "unresolved-require",
       "unused"
