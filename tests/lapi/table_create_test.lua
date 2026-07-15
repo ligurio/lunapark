@@ -13,6 +13,7 @@ Synopsis:
 local luzer = require("luzer")
 local test_lib = require("lib")
 
+---@type function
 local table_create
 if test_lib.lua_version() == "LuaJIT" then
     table_create = require("table.new")

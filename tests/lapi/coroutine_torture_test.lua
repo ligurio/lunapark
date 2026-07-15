@@ -109,7 +109,9 @@ local function hook_func(_event)
     end
     -- Accessing Upvalues,
     -- https://www.lua.org/pil/23.1.2.html.
-    local func = debug.getinfo(level).func
+    local gi = debug.getinfo(level)
+    assert(gi ~= nil)
+    local func = gi.func
     i = 1
     while true do
         local name, _ = debug.getupvalue(func, i)

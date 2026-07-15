@@ -144,8 +144,12 @@ local function debug_hook()
         end
 
         -- "Touch" upvalues.
-        local func = debug.getinfo(level, what_modes_str).func
-        local nups = debug.getinfo(level, "u").nups
+        local gi = debug.getinfo(level, what_modes_str)
+        assert(gi ~= nil)
+        local func = gi.func
+        gi = debug.getinfo(level, "u")
+        assert(gi ~= nil)
+        local nups = gi.nups
         touch_upvalues(func, nups)
 
         level = level + 1
