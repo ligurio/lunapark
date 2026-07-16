@@ -47,7 +47,7 @@ local function TestOneInput(buf)
     assert(bxor(bxor(x, y), y) == x)
 
     if test_lib.lua_version() == "LuaJIT" then
-        local MAX_UINT = bor(test_lib.MAX_INT, test_lib.MIN_INT)
+        local MAX_UINT = bor(MAX_INT, MIN_INT)
         assert(bxor(x, MAX_UINT) == bnot(x))
     else
         local MAX_UINT64 = bor(test_lib.MAX_INT64, test_lib.MIN_INT64)

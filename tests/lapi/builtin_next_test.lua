@@ -17,6 +17,7 @@ Synopsis: next(table [, index])
 local luzer = require("luzer")
 local test_lib = require("lib")
 local MAX_INT = test_lib.MAX_INT
+local MIN_INT = test_lib.MIN_INT
 
 local ignored_msgs = {
     "invalid key to 'next'",
@@ -26,7 +27,7 @@ local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
     local MAX_N = 1000
     local count = fdp:consume_integer(0, MAX_N)
-    local tbl = fdp:consume_integers(test_lib.MIN_INT, test_lib.MAX_INT, count)
+    local tbl = fdp:consume_integers(MIN_INT, MAX_INT, count)
     -- Use string keys to activate hash part of the table.
     tbl.a = fdp:consume_string(test_lib.MAX_STR_LEN)
     tbl.b = fdp:consume_string(test_lib.MAX_STR_LEN)
