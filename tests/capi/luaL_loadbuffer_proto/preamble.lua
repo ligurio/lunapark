@@ -4,6 +4,7 @@ local always_number = function(val)
     return tonumber(val) or DEFAULT_NUMBER
 end
 
+---@diagnostic disable-next-line: unused
 local not_nan_and_nil = function(val)
     return (val ~= val or val == nil) and DEFAULT_NUMBER or val
 end
@@ -180,6 +181,7 @@ debug.setmetatable(true, {
     __sub = __sub,
     __unm = __unm,
 })
+---@diagnostic disable-next-line: unused
 local table_mt = {
     __add = __add,
     __call = __call,
@@ -197,6 +199,7 @@ local table_mt = {
     __unm = __unm,
 }
 
+---@diagnostic disable-next-line: unused
 local only_numbers_cmp = function(v1, v2, cmp_op_str)
     local op_func = {
         ['<'] = function(a1, a2) return a1 < a2 end,
