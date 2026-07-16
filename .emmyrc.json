@@ -10,7 +10,6 @@
     "disable": [
       "access-invisible",
       "deprecated",
-      "inject-field",
       "missing-parameter",
       "need-check-nil",
       "param-type-mismatch",
