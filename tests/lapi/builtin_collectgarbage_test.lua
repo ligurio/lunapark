@@ -154,6 +154,7 @@ end
 -- When the finalizer runs during GC sweep, it triggers
 -- another GC step. This can collide with table rehashing.
 local function workload_finalizer_rehash(fdp)
+    --- @type userdata?
     local fin = newproxy(true) -- luacheck: no unused
     local fin_called = false
     getmetatable(fin).__gc = function()
