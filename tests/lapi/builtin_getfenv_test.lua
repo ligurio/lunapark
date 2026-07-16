@@ -34,6 +34,7 @@ local function TestOneInput(buf)
     if err then
         return -1
     end
+    assert(type(fenv) == "table", "fenv must be a table")
     local magic_str = fdp:consume_string(test_lib.MAX_STR_LEN)
     fenv["magic"] = magic_str
     setfenv(level, fenv)
