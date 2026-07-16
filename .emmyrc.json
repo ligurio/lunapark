@@ -9,7 +9,6 @@
   "diagnostics": {
     "disable": [
       "access-invisible",
-      "assign-type-mismatch",
       "await-in-sync",
       "deprecated",
       "inject-field",
