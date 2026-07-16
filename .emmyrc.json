@@ -10,7 +10,6 @@
     "disable": [
       "access-invisible",
       "deprecated",
-      "preferred-local-alias",
       "redundant-parameter",
       "unnecessary-assert",
       "unnecessary-if",
