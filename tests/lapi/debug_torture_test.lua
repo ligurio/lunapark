@@ -83,7 +83,7 @@ local function check_getinfo(ar)
     end
 
     if what_modes_map.l then
-        assert(ar.currentline ~= nil and type(ar.currentline) == "number")
+        assert(ar.currentline == nil or type(ar.currentline) == "number")
     end
 
     if what_modes_map.t then
