@@ -14,6 +14,8 @@ if test_lib.lua_version() ~= "LuaJIT" then
 end
 
 local bswap = bit.bswap
+local tobit = bit.tobit
+local bnot = bit.bnot
 
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
@@ -23,6 +25,17 @@ local function TestOneInput(buf)
     local x = fdp:consume_integer(MIN_INT, MAX_INT)
     local res = bswap(x)
     assert(type(res) == "number")
+
+    -- Involution.
+    assert(bswap(res) == tobit(x))
+
+    -- bswap commutes with bnot.
+    assert(bswap(bnot(x)) == bnot(bswap(x)))
+
+    -- Edge cases. `bit.bswap` operates on signed 32-bit values, so
+    -- compare with the truncated literal.
+    assert(bswap(0) == 0)
+    assert(bswap(0xFFFFFFFF) == tobit(0xFFFFFFFF))
 end
 
 local args = {
