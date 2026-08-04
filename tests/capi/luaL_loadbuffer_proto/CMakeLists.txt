@@ -5,6 +5,8 @@ endif ()
 
 set(test_lua_sources)
 lua_source(test_lua_sources preamble.lua preamble_lua)
+set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/preamble.lua.c
+    PROPERTIES COMPILE_OPTIONS "-Wno-overlength-strings")
 
 add_custom_target(generate_test_lua_sources
     WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/tests/capi/luaL_loadbuffer_proto/
