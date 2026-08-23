@@ -62,7 +62,7 @@ local hook_mask = {
          -- code.
 }
 
-local loadstring = type(loadstring) == "function" and loadstring or load
+local loadstring = test_lib.loadstring
 
 local what_modes_str
 local what_modes_map = {}
