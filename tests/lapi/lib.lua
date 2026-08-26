@@ -253,10 +253,19 @@ local function arrays_equal(t1, t2)
     return #t1 == #t2
 end
 
+local function is_file_exist(path)
+    local file = io.open(path, "r")
+    if file then
+        file:close()
+    end
+    return file ~= nil
+end
+
 return {
     approx_equal = approx_equal,
     arrays_equal = arrays_equal,
     bitwise_op = bitwise_op,
+    is_file_exist = is_file_exist,
     is_inf = is_inf,
     is_nan = is_nan,
     lua_current_version_ge_than = lua_current_version_ge_than,
