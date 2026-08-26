@@ -26,7 +26,25 @@ local function TestOneInput(buf)
     fh:write(chunk)
     fh:close()
 
-    pcall(loadfile, chunk_filename)
+    pcall(function()
+        local fn, err = loadfile(chunk_filename)
+        if fn ~= nil then
+            -- The compiled chunk must be a function; execute it.
+            assert(type(fn) == "function")
+            pcall(fn)
+        else
+            -- On failure loadfile returns a string error message.
+            assert(type(err) == "string")
+        end
+    end)
+
+    -- Loading a missing file must return nil plus an error message.
+    local missing = chunk_filename .. ".missing"
+    if not test_lib.is_file_exist(missing) then
+        local fn, err = loadfile(missing)
+        assert(fn == nil)
+        assert(type(err) == "string")
+    end
 
     os.remove(chunk_filename)
 end
