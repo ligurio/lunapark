@@ -42,7 +42,16 @@ local function TestOneInput(buf)
     -- it cannot find any loader for the module, then require
     -- signals an error,
     -- https://www.lua.org/manual/5.1/manual.html#pdf-require.
-    pcall(require, module_name)
+    local ok, result = pcall(require, module_name)
+    if ok then
+        -- Require caches the module in package.loaded and returns
+        -- it.
+        assert(package.loaded[module_name] == result)
+    else
+        -- On failure require must not leave the module in
+        -- package.loaded.
+        assert(not package.loaded[module_name])
+    end
 
     -- Teardown.
     package.path = old_path
