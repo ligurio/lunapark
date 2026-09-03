@@ -14,6 +14,7 @@ pkgs.mkShell {
     cbmc-viewer
     clang
     cmake
+    emmylua_check
     git
     gnumake
     libunwind
