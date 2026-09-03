@@ -17,6 +17,7 @@ local test_lib = require("lib")
 local MIN_INT = test_lib.MIN_INT64
 local MAX_INT = test_lib.MAX_INT64
 
+---@return (integer | string)[]
 local function random_table(fdp, n)
     local count = fdp:consume_integer(0, n)
     local item_type = fdp:oneof({ "number", "string" })

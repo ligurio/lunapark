@@ -25,6 +25,9 @@ local function TestOneInput(buf, _size)
     local s = fdp:consume_string(test_lib.MAX_STR_LEN)
     local pattern = fdp:consume_string(test_lib.MAX_STR_LEN)
     local init = fdp:consume_integer(0, test_lib.MAX_INT)
+    -- The `init` parameter is a Lua 5.4 extension; the emmylua stdlib
+    -- model is configured for LuaJIT, which knows only two parameters.
+    ---@diagnostic disable-next-line: redundant-parameter
     string.gmatch(s, pattern, init)
 end
 

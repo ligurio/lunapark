@@ -27,6 +27,9 @@ local function TestOneInput(buf)
     local j = fdp:consume_integer(0, MAX_INT)
     local lax = fdp:consume_boolean()
     os.setlocale(test_lib.random_locale(fdp), "all")
+    -- The `lax` parameter is a Lua 5.4 extension; the emmylua stdlib
+    -- model is configured for LuaJIT and counts arguments loosely.
+    ---@diagnostic disable-next-line: redundant-parameter
     pcall(utf8.codepoint, s, i, j, lax)
 end
 

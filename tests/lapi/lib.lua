@@ -63,6 +63,7 @@ local function bitwise_op(op_name)
     return function(...)
         local n = select("#", ...)
         assert(n > 0)
+        ---@type string
         local chunk
         -- Bitwise exclusive OR and bitwise NOT have the same
         -- operator.
@@ -76,6 +77,9 @@ local function bitwise_op(op_name)
             local op_name_ws = (" %s "):format(op_name)
             chunk = "return " .. table.concat({...}, op_name_ws)
         end
+        -- `load` accepts a reader function or a Lua literal chunk
+        -- type, not a dynamically built string; the call is valid.
+        ---@diagnostic disable-next-line: param-type-mismatch
         return assert(load(chunk))()
     end
 end

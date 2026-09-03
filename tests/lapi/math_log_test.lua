@@ -22,6 +22,7 @@ local test_lib = require("lib")
 -- Libraries.
 --
 -- 1. https://www.lua.org/manual/5.3/manual.html
+---@type fun(x: number, y: number): number
 local pow
 if test_lib.lua_current_version_ge_than(5, 3) then
     pow = test_lib.math_pow
