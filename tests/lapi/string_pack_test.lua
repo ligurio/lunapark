@@ -26,8 +26,36 @@ local function TestOneInput(buf, _size)
         return -1
     end
     local n = fdp:consume_integer(1, test_lib.MAX_INT)
-    local values = fdp:consume_strings(test_lib.MAX_STR_LEN,  n)
-    pcall(string.pack, fmt_str, table.unpack(values))
+    local values = fdp:consume_strings(test_lib.MAX_STR_LEN, n)
+
+    local ok, res = pcall(string.pack, fmt_str, table.unpack(values))
+    if not ok then
+        return
+    end
+    assert(type(res) == "string")
+
+    -- The packed string must be fully consumed by string.unpack.
+    local unpack_ok, next_pos, unpacked = pcall(function()
+        local results = { string.unpack(fmt_str, res) }
+        return table.remove(results), results
+    end)
+    if unpack_ok then
+        assert(next_pos == #res + 1)
+
+        -- Repacking the unpacked values must reproduce the packed
+        -- string.
+        local repack_ok, repacked = pcall(string.pack, fmt_str,
+            table.unpack(unpacked))
+        if repack_ok then
+            assert(repacked == res)
+        end
+    end
+
+    -- For fixed-size formats, string.packsize must match the size.
+    local ok_size, size = pcall(string.packsize, fmt_str)
+    if ok_size then
+        assert(size == #res)
+    end
 end
 
 local args = {
