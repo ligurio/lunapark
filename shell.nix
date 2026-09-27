@@ -17,7 +17,7 @@ let
   commonInputs = with p; [
     clang
     cmake
-    emmylua_check
+    emmylua-check
     git
     gnumake
     libunwind
