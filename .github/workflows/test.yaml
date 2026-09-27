@@ -33,6 +33,13 @@ jobs:
           - "lua"
           - "luajit"
           - "tarantool"
+        ARCH:
+          - "x86_64"
+          - "i386"
+        exclude:
+          # A 32-bit build is not required for Tarantool.
+          - LUA: "tarantool"
+            ARCH: "i386"
       fail-fast: false
     runs-on: ubuntu-24.04
     steps:
@@ -41,6 +48,10 @@ jobs:
           fetch-depth: 0
           submodules: recursive
           repository: ${{ matrix.LUA == 'tarantool' && 'tarantool/tarantool' || github.repository }}
+
+      - name: Enable 32-bit architecture
+        run: sudo dpkg --add-architecture i386
+        if: ${{ matrix.ARCH == 'i386' }}
 
       - name: Setup common packages
         run: |
@@ -65,11 +76,19 @@ jobs:
                               libtool \
                               util-linux
 
+      - name: Setup 32-bit packages
+        run: |
+          sudo apt install -y gcc-multilib \
+                              g++-multilib \
+                              libreadline-dev:i386
+        if: ${{ matrix.ARCH == 'i386' }}
+
       - name: Running CMake (PUC Rio Lua -current)
         run: |
           cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
                 -DUSE_LUA=ON -DENABLE_BUILD_PROTOBUF=OFF \
                 -DENABLE_INTERNAL_TESTS=ON -DENABLE_LAPI_TESTS=ON \
+                ${{ matrix.ARCH == 'i386' && '-DCMAKE_C_FLAGS=-m32 -DCMAKE_CXX_FLAGS=-m32 -DCMAKE_EXE_LINKER_FLAGS=-m32 -DCMAKE_SHARED_LINKER_FLAGS=-m32 -DENABLE_UBSAN=ON' || '' }} \
                 -G Ninja -S . -B build
         if: ${{ matrix.LUA == 'lua' }}
 
@@ -79,6 +98,7 @@ jobs:
                 -DUSE_LUAJIT=ON -DENABLE_BUILD_PROTOBUF=OFF \
                 -DENABLE_INTERNAL_TESTS=ON -DENABLE_LAPI_TESTS=ON \
                 -DENABLE_LUAJIT_RANDOM_RA=ON \
+                ${{ matrix.ARCH == 'i386' && '-DCMAKE_C_FLAGS=-m32 -DCMAKE_CXX_FLAGS=-m32 -DCMAKE_EXE_LINKER_FLAGS=-m32 -DCMAKE_SHARED_LINKER_FLAGS=-m32 -DENABLE_UBSAN=ON' || '' }} \
                 -G Ninja -S . -B build
         if: ${{ matrix.LUA == 'luajit' }}
 
