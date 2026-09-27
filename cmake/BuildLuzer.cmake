@@ -18,12 +18,21 @@ list(APPEND LUZER_CMAKE_FLAGS
     "-DCMAKE_LUA_LIBRARIES=${LUA_LIBRARIES_LOCATION}"
     "-DOSS_FUZZ=${OSS_FUZZ}"
 )
+# Propagate the compiler and linker flags (e.g. `-m32` in a 32-bit
+# multilib build) to the luzer build, otherwise it compiles 64-bit
+# objects and links them against a 32-bit liblua.
+list(APPEND LUZER_CMAKE_FLAGS
+    "-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}"
+    "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}"
+    "-DCMAKE_EXE_LINKER_FLAGS=${CMAKE_EXE_LINKER_FLAGS}"
+    "-DCMAKE_SHARED_LINKER_FLAGS=${CMAKE_SHARED_LINKER_FLAGS}"
+)
 # Prevents an error on loading `luzer_impl.so` due to undefined
 # symbol `llvm_gcda_summary_info`.
 if(ENABLE_COV)
   list(APPEND LUZER_CMAKE_FLAGS
-      -DCMAKE_C_FLAGS=-fprofile-instr-generate
-      -DCMAKE_CXX_FLAGS=-fprofile-instr-generate
+      "-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS} -fprofile-instr-generate"
+      "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} -fprofile-instr-generate"
   )
 endif()
 if(USE_LUAJIT)
@@ -42,6 +51,9 @@ ExternalProject_Add(bundled-luzer
     BINARY_DIR ${LUZER_BUILD_DIR}
     TMP_DIR ${LUZER_DIR}/tmp
     STAMP_DIR ${LUZER_DIR}/stamp
+    # Fix arch detection in a 32-bit multilib build (`-m32` on an
+    # x86_64 host), see patches/luzer.patch.
+    PATCH_COMMAND git reset --hard && cd <SOURCE_DIR> && patch -p1 -i ${PROJECT_SOURCE_DIR}/patches/luzer.patch
     CONFIGURE_COMMAND
         ${CMAKE_COMMAND} -B <BINARY_DIR> -S <SOURCE_DIR>
             -G ${CMAKE_GENERATOR} ${LUZER_CMAKE_FLAGS}

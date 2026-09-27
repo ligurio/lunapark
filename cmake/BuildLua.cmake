@@ -5,6 +5,10 @@ macro(build_lua LUA_VERSION)
     set(LUA_PATCH_PATH ${PROJECT_SOURCE_DIR}/patches/puc-rio-lua.patch)
 
     set(CFLAGS "${CMAKE_C_FLAGS} -fno-omit-frame-pointer")
+    # Propagate the linker flags (e.g. `-m32` for a 32-bit build) to
+    # the link step of the `lua` executable, otherwise a 32-bit
+    # liblua.a is linked as a 64-bit binary.
+    set(LDFLAGS "${CMAKE_EXE_LINKER_FLAGS}")
     if (ENABLE_LUA_ASSERT)
         AppendFlags(CFLAGS -DLUAI_ASSERT)
     endif()
