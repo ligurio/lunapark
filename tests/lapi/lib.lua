@@ -51,8 +51,29 @@ end
 --
 -- 1. https://www.lua.org/manual/5.1/manual.html#lua_Integer
 -- 2. https://www.lua.org/manual/5.3/manual.html#lua_Integer
-local MAX_INT64 = math.maxinteger or  0x7ffffffffffffc00
-local MIN_INT64 = math.mininteger or -0x8000000000000000
+local is_luajit = pcall(require, "jit")
+
+-- The maximum and minimum values representable by `lua_Integer`.
+local MAX_INT64, MIN_INT64
+if math.maxinteger then
+    -- Lua 5.3+: `lua_Integer` is 64-bit by default.
+    MAX_INT64 = math.maxinteger
+    MIN_INT64 = math.mininteger
+else
+    -- Lua 5.1, 5.2 and LuaJIT: `lua_Integer` is `ptrdiff_t`, that is
+    -- 32-bit in an i386 build.
+    local ptr_size = 8
+    if is_luajit then
+        ptr_size = require("ffi").sizeof("intptr_t")
+    end
+    if ptr_size == 4 then
+        MAX_INT64 = 0x7fffffff
+        MIN_INT64 = -0x80000000
+    else
+        MAX_INT64 = 0x7ffffffffffffc00
+        MIN_INT64 = -0x8000000000000000
+    end
+end
 -- 32-bit integers
 local MAX_INT =  0x7fffffff
 local MIN_INT = -0x80000000
