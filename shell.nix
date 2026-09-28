@@ -22,19 +22,18 @@ let
     gnumake
     libunwind
     ninja
+    protobuf_21
     readline
     xz
     zlib
   ];
 
-  # Formal verification and lint tooling, plus protobuf for the native
-  # protobuf-based tests. Not needed for a 32-bit target (those tests are
-  # skipped, see tests/capi/CMakeLists.txt) and not in the i686 cache.
+  # Formal verification and lint tooling. Not needed for a 32-bit target
+  # and not present in the i686 binary cache, so keep them native-only.
   nativeInputs = with pkgs; [
     cbmc
     cbmc-viewer
     emmylua-check
-    protobuf_21
   ];
 in
 p.mkShell {
