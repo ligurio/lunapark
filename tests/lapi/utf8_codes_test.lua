@@ -28,10 +28,16 @@ local function TestOneInput(buf)
     local s = fdp:consume_string(max_len)
     local lax = fdp:consume_boolean()
     os.setlocale(test_lib.random_locale(fdp), "all")
-    -- The `lax` parameter is a Lua 5.4 extension; the emmylua stdlib
-    -- model is configured for LuaJIT and counts arguments loosely.
-    ---@diagnostic disable-next-line: redundant-parameter
-    pcall(utf8.codes, s, lax)
+    pcall(function()
+        local last_pos = 0
+        for pos, code in utf8.codes(s, lax) do
+            assert(code >= 0 and code <= 0x10FFFF, "bad code point")
+            assert(code < 0xD800 or code > 0xDFFF, "surrogate")
+            assert(pos > last_pos, "pos not monotonic")
+            last_pos = pos
+        end
+        assert(last_pos == #s + 1, "did not consume all input")
+    end)
 end
 
 local args = {
