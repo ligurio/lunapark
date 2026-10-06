@@ -61,4 +61,4 @@ jobs:
       - uses: ./.github/actions/setup-emmylua-analyzer
 
       - name: Run emmylua_check
-        run: emmylua_check tests --config .emmyrc.json
+        run: emmylua_check tests --config .emmyrc.json --warnings-as-errors
