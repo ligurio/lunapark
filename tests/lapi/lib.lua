@@ -84,6 +84,9 @@ local function bitwise_op(op_name)
     end
 end
 
+---@param x number
+---@param y number
+---@return number
 local function math_pow(x, y)
     return x ^ y
 end

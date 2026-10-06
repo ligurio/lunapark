@@ -19,5 +19,5 @@ runs:
           ${{ runner.os }}-cargo-
 
     - name: Setup emmylua_check
-      run: cargo install emmylua_check --version 0.24.0
+      run: cargo install emmylua_check --version 0.25.1
       shell: bash

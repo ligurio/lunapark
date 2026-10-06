@@ -22,6 +22,10 @@ local function TestOneInput(buf)
     -- Since Lua 5.4 the function returns the two seed components
     -- that were effectively used, so that setting them again
     -- repeats the sequence.
+    -- The second seed is a Lua 5.4 extension; the emmylua stdlib
+    -- model is configured for LuaJIT, which knows only one
+    -- parameter.
+    ---@diagnostic disable-next-line: redundant-parameter
     local a, b = math.randomseed(x, y)
     if test_lib.lua_current_version_ge_than(5, 4) then
         assert(type(a) == "number" and type(b) == "number")
