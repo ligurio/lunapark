@@ -36,6 +36,206 @@ local function lua_current_version_lt_than(major, minor)
     return not lua_current_version_ge_than(major, minor)
 end
 
+-- Lua 5.1 spells `load` as `loadstring`; since 5.2 `load` takes a
+-- string.
+local loadstring = type(loadstring) == "function" and loadstring or load
+
+-- Dispatched for tables since Lua 5.1, so they need no runtime
+-- probe.
+local MM_ALWAYS = {
+    __add = true,
+    __call = true,
+    __concat = true,
+    __div = true,
+    __eq = true,
+    __index = true,
+    __le = true,
+    __lt = true,
+    __metatable = true,
+    __mode = true,
+    __mod = true,
+    __mul = true,
+    __newindex = true,
+    __pow = true,
+    __sub = true,
+    __tostring = true,
+    __unm = true,
+}
+
+-- The six bitwise metamethods were all introduced together
+-- (Lua 5.3) and are all absent from LuaJIT, so they share
+-- a single probe.
+local BITWISE_MM = {
+    __band = true,
+    __bnot = true,
+    __bor = true,
+    __bxor = true,
+    __shl = true,
+    __shr = true,
+}
+
+-- Compiles and runs a snippet, returning false when it does not
+-- compile. Needed only for probes that use syntax absent from
+-- older Lua versions (`//`, bitwise operators, `<close>`).
+local function probe_chunk(code)
+    local chunk = loadstring(code)
+    if chunk == nil then
+        return false
+    end
+    local ok, res = pcall(chunk)
+    return ok and res == true
+end
+
+local MM_PROBES = {
+    __len = function()
+        local t = setmetatable({}, {
+            __len = function() return 42 end,
+        })
+        return #t == 42
+    end,
+    __gc = function()
+        local hit = false
+        local function make()
+            setmetatable({}, {
+                __gc = function() hit = true end,
+            })
+        end
+        make()
+        collectgarbage("collect")
+        collectgarbage("collect")
+        return hit
+    end,
+    __pairs = function()
+        local hit = false
+        local t = setmetatable({}, {
+            __pairs = function(tt)
+                hit = true
+                return next, tt, nil
+            end,
+        })
+        for _ in pairs(t) do end
+        return hit
+    end,
+    __ipairs = function()
+        local hit = false
+        local t = setmetatable({}, {
+            __ipairs = function(tt)
+                hit = true
+                return function() return nil end, tt, 0
+            end,
+        })
+        for _ in ipairs(t) do end
+        return hit
+    end,
+    __name = function()
+        local t = setmetatable({}, {
+            __name = "MMProbe"
+        })
+        return tostring(t):find("MMProbe", 1, true) ~= nil
+    end,
+    -- `//` does not parse before Lua 5.3; LuaJIT has the `&`
+    -- syntax but no bit operator metamethods, so the snippets
+    -- exercise the metamethod dispatch rather than the syntax.
+    __idiv = function()
+        return probe_chunk([[
+            local t = setmetatable({}, {
+                __idiv = function() return 42 end
+            })
+            return t // 1 == 42
+        ]])
+    end,
+    __band = function()
+        return probe_chunk([[
+            local t = setmetatable({}, {
+                __band = function() return 42 end
+            })
+            return t & 1 == 42
+        ]])
+    end,
+    -- `<close>` does not parse before Lua 5.4.
+    __close = function()
+        return probe_chunk([[
+            local h = false
+            do local x <close> = setmetatable({}, {
+                __close = function() h = true end
+            })
+            end
+            return h
+        ]])
+    end,
+}
+
+local MM_SUPPORT = {}
+
+-- `has_mm(name)` reports whether the running Lua implementation
+-- dispatches the metamethod `name` for tables. `name` is the
+-- metatable event key (e.g. "__len", "__pairs").
+--
+-- Metamethods dispatched since Lua 5.1 are always reported as
+-- supported and need no runtime probe. The rest are probed by
+-- building a table with the candidate metamethod and running the
+-- corresponding operation; probe results are cached on the first
+-- call for a name. Most probes are plain functions, but a few use
+-- `load`, because the syntax they exercise (`//`, bitwise
+-- operators, `<close>`) does not parse in older Lua versions.
+--
+-- Support matrix for metamethods
+--
+--     Metamethod     5.1  5.2  5.3  5.4  LuaJIT
+--     -----------------------------------------
+--     __add          Yes  Yes  Yes  Yes  Yes
+--     __band         No   No   Yes  Yes  No
+--     __bnot         No   No   Yes  Yes  No
+--     __bor          No   No   Yes  Yes  No
+--     __bxor         No   No   Yes  Yes  No
+--     __call         Yes  Yes  Yes  Yes  Yes
+--     __close        No   No   No   Yes  No
+--     __concat       Yes  Yes  Yes  Yes  Yes
+--     __div          Yes  Yes  Yes  Yes  Yes
+--     __eq           Yes  Yes  Yes  Yes  Yes
+--     __gc           No   Yes  Yes  Yes  No
+--     __idiv         No   No   Yes  Yes  No
+--     __index        Yes  Yes  Yes  Yes  Yes
+--     __ipairs       No   Yes  Yes* No   No*
+--     __len          No   Yes  Yes  Yes  No*
+--     __le           Yes  Yes  Yes  Yes  Yes
+--     __lt           Yes  Yes  Yes  Yes  Yes
+--     __metatable    Yes  Yes  Yes  Yes  Yes
+--     __mode         Yes  Yes  Yes  Yes  Yes
+--     __mod          Yes  Yes  Yes  Yes  Yes
+--     __mul          Yes  Yes  Yes  Yes  Yes
+--     __name         No   No   Yes  Yes  No
+--     __newindex     Yes  Yes  Yes  Yes  Yes
+--     __pairs        No   Yes  Yes  Yes  No*
+--     __pow          Yes  Yes  Yes  Yes  Yes
+--     __shl          No   No   Yes  Yes  No
+--     __shr          No   No   Yes  Yes  No
+--     __sub          Yes  Yes  Yes  Yes  Yes
+--     __tostring     Yes  Yes  Yes  Yes  Yes
+--     __unm          Yes  Yes  Yes  Yes  Yes
+--
+--     * `__ipairs` is deprecated in Lua 5.3 and removed in
+--       Lua 5.4.
+--     * LuaJIT "Yes" for `__len`/`__pairs`/`__ipairs` only when
+--       it is built with LUA52COMPAT; the probe detects the
+--       actual build.
+
+local function has_mm(name)
+    ---@diagnostic disable-next-line: unnecessary-if
+    if MM_ALWAYS[name] then
+        return true
+    end
+    local key = BITWISE_MM[name] and "__band" or name
+    local probe = MM_PROBES[key]
+    if probe == nil then
+        error("has_mm: unknown metamethod " .. tostring(name))
+    end
+    if MM_SUPPORT[key] == nil then
+        MM_SUPPORT[key] = probe()
+    end
+    return MM_SUPPORT[key]
+end
+
 -- By default `lua_Integer` is ptrdiff_t in Lua 5.1 and Lua 5.2
 -- and `long long` in Lua 5.3+, (usually a 64-bit two-complement
 -- integer), but that can be changed to `long` or `int` (usually a
@@ -268,9 +468,11 @@ return {
     approx_equal = approx_equal,
     arrays_equal = arrays_equal,
     bitwise_op = bitwise_op,
+    has_mm = has_mm,
     is_file_exist = is_file_exist,
     is_inf = is_inf,
     is_nan = is_nan,
+    loadstring = loadstring,
     lua_current_version_ge_than = lua_current_version_ge_than,
     lua_current_version_lt_than = lua_current_version_lt_than,
     lua_version = lua_version,
