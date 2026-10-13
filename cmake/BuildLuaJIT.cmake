@@ -3,6 +3,10 @@ macro(build_luajit LJ_VERSION)
     set(LJ_BINARY_DIR ${PROJECT_BINARY_DIR}/luajit-${LJ_VERSION}/work)
 
     set(CFLAGS ${CMAKE_C_FLAGS})
+    # Propagate the linker flags (e.g. `-m32` for a 32-bit build) to
+    # the link step of the `luajit` executable, otherwise a 32-bit
+    # libluajit.a is linked as a 64-bit binary.
+    set(LDFLAGS "${CMAKE_EXE_LINKER_FLAGS}")
     if (ENABLE_LUA_ASSERT)
         AppendFlags(CFLAGS -DLUA_USE_ASSERT)
     endif()

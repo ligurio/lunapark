@@ -3,7 +3,21 @@
 # match to hardware architecture name used in a library name of
 # libclang_rt.fuzzer_no_main: aarch64, x86_64, i386.
 function(SetHwArchString outvar)
-  set(${outvar} ${CMAKE_SYSTEM_PROCESSOR} PARENT_SCOPE)
+  set(HW_ARCH ${CMAKE_SYSTEM_PROCESSOR})
+  # In a multilib build (`-m32`) CMAKE_SYSTEM_PROCESSOR is still the
+  # host architecture, so pick the libFuzzer runtime library that
+  # matches the target architecture instead. Runtime library names are
+  # `i386` and `x86_64`.
+  if(HW_ARCH MATCHES "x86_64|amd64")
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+      set(HW_ARCH "x86_64")
+    else()
+      set(HW_ARCH "i386")
+    endif()
+  elseif(HW_ARCH MATCHES "^i[3-6]86$")
+    set(HW_ARCH "i386")
+  endif()
+  set(${outvar} ${HW_ARCH} PARENT_SCOPE)
 endfunction()
 
 # The function sets the given variable in a parent scope to a
@@ -54,6 +68,13 @@ function(SetLibFuzzerObjDir outvar)
   set(LibFuzzerDir ${PROJECT_BINARY_DIR}/libFuzzer_unpacked)
   file(MAKE_DIRECTORY ${LibFuzzerDir})
   SetLibFuzzerPath(LibFuzzerPath)
+  # Remove stale objects extracted from a runtime library built for a
+  # different architecture (e.g. after switching from x86_64 to i386).
+  file(GLOB LibFuzzerObjs "${LibFuzzerDir}/*.o")
+  list(LENGTH LibFuzzerObjs LibFuzzerObjsLen)
+  if(LibFuzzerObjsLen GREATER 0)
+    file(REMOVE ${LibFuzzerObjs})
+  endif()
   execute_process(
     COMMAND ${CMAKE_AR} x ${LibFuzzerPath} --output ${LibFuzzerDir}
     RESULT_VARIABLE CMD_ERROR

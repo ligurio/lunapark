@@ -143,8 +143,28 @@ foreach(filename ${tests})
   )
 endforeach()
 
-include(ProtobufMutator)
-add_subdirectory(luaL_loadbuffer_proto)
-if(IS_LUAJIT)
-  add_subdirectory(ffi_cdef_proto)
-endif ()
+# libprotobuf-mutator and its dependencies (protobuf, zlib, liblzma)
+# are not available in a 32-bit multilib cross build (`-m32` on an
+# x86_64 toolchain), so skip protobuf-based tests there. A native i686
+# toolchain (e.g. Nix pkgsi686Linux) provides 32-bit libraries, so the
+# tests are built for it.
+set(_skip_protobuf_tests FALSE)
+if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+  execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpmachine
+                  OUTPUT_VARIABLE _default_target
+                  OUTPUT_STRIP_TRAILING_WHITESPACE
+                  ERROR_QUIET)
+  if(_default_target MATCHES "^x86_64")
+    set(_skip_protobuf_tests TRUE)
+  endif()
+endif()
+
+if(_skip_protobuf_tests)
+  message(STATUS "Skip protobuf-based tests in a 32-bit cross build")
+else()
+  include(ProtobufMutator)
+  add_subdirectory(luaL_loadbuffer_proto)
+  if(IS_LUAJIT)
+    add_subdirectory(ffi_cdef_proto)
+  endif ()
+endif()

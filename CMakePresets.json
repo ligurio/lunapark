@@ -74,6 +74,47 @@
           "value": "TRUE"
         }
       }
+    },
+    {
+      "name": "configure_i386",
+      "hidden": true,
+      "inherits": "configure_default",
+      "cacheVariables": {
+        "CMAKE_C_FLAGS": "-m32",
+        "CMAKE_CXX_FLAGS": "-m32",
+        "CMAKE_EXE_LINKER_FLAGS": "-m32",
+        "CMAKE_SHARED_LINKER_FLAGS": "-m32",
+        "ENABLE_ASAN": {
+          "type": "BOOL",
+          "value": "FALSE"
+        },
+        "ENABLE_UBSAN": {
+          "type": "BOOL",
+          "value": "TRUE"
+        },
+        "ENABLE_INTERNAL_TESTS": {
+          "type": "BOOL",
+          "value": "TRUE"
+        }
+      }
+    },
+    {
+      "name": "configure_lua_i386",
+      "inherits": [
+        "configure_i386",
+        "configure_lua"
+      ],
+      "displayName": "PUC Rio Lua (i386)",
+      "binaryDir": "${sourceDir}/build/lua-i386"
+    },
+    {
+      "name": "configure_luajit_i386",
+      "inherits": [
+        "configure_i386",
+        "configure_luajit"
+      ],
+      "displayName": "LuaJIT (i386)",
+      "binaryDir": "${sourceDir}/build/luajit-i386"
     }
   ],
   "buildPresets": [
@@ -94,6 +135,18 @@
       "displayName": "LuaJIT",
       "configurePreset": "configure_luajit",
       "inherits": "build_default"
+    },
+    {
+      "name": "build_lua_i386",
+      "displayName": "PUC Rio Lua (i386)",
+      "configurePreset": "configure_lua_i386",
+      "inherits": "build_default"
+    },
+    {
+      "name": "build_luajit_i386",
+      "displayName": "LuaJIT (i386)",
+      "configurePreset": "configure_luajit_i386",
+      "inherits": "build_default"
     }
   ],
   "testPresets": [
@@ -112,6 +165,18 @@
       "name": "test_luajit",
       "displayName": "LuaJIT",
       "configurePreset": "configure_luajit",
+      "inherits": "test_default"
+    },
+    {
+      "name": "test_lua_i386",
+      "displayName": "PUC Rio Lua (i386)",
+      "configurePreset": "configure_lua_i386",
+      "inherits": "test_default"
+    },
+    {
+      "name": "test_luajit_i386",
+      "displayName": "LuaJIT (i386)",
+      "configurePreset": "configure_luajit_i386",
       "inherits": "test_default"
     }
   ],
@@ -149,6 +214,42 @@
         {
           "type": "test",
           "name": "test_luajit"
+        }
+      ]
+    },
+    {
+      "name": "lua-i386",
+      "displayName": "PUC Rio Lua (i386)",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "configure_lua_i386"
+        },
+        {
+          "type": "build",
+          "name": "build_lua_i386"
+        },
+        {
+          "type": "test",
+          "name": "test_lua_i386"
+        }
+      ]
+    },
+    {
+      "name": "luajit-i386",
+      "displayName": "LuaJIT (i386)",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "configure_luajit_i386"
+        },
+        {
+          "type": "build",
+          "name": "build_luajit_i386"
+        },
+        {
+          "type": "test",
+          "name": "test_luajit_i386"
         }
       ]
     }
