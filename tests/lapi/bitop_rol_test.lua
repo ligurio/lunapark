@@ -17,6 +17,8 @@ if test_lib.lua_version() ~= "LuaJIT" then
 end
 
 local rol = bit.rol
+local tobit = bit.tobit
+local bnot = bit.bnot
 
 local function TestOneInput(buf)
     local fdp = luzer.FuzzedDataProvider(buf)
@@ -33,6 +35,21 @@ local function TestOneInput(buf)
     --
     -- 1. https://www.lua.org/manual/5.2/manual.html
     assert(rol(x, n) == rol(x, n % 32))
+
+    -- Zero and full-word rotate.
+    assert(rol(x, 0) == tobit(x))
+    assert(rol(x, 32) == tobit(x))
+
+    -- Composability: rol(rol(x, 1), n-1) == rol(x, n)
+    if n > 0 then
+        assert(rol(rol(x, 1), n - 1) == rol(x, n))
+    end
+
+    -- Inverse: double rotate yields original.
+    assert(rol(rol(x, n), -n) == tobit(x))
+
+    -- Commutation with NOT.
+    assert(rol(bnot(x), n) == bnot(rol(x, n)))
 end
 
 local args = {
