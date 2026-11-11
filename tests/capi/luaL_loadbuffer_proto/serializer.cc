@@ -1383,9 +1383,17 @@ PROTO_TOSTRING(UnaryOperator, op)
 PROTO_TOSTRING(Name, name)
 {
 	std::string ident = ConvertToStringDefault(name.name(), true);
-	/* Prevent using reserved keywords as identifiers. */
 	if (KReservedLuaKeywords.find(ident) != KReservedLuaKeywords.end()) {
+		/*
+		 * Prevent using reserved keywords as identifiers.
+		 */
 		ident += "_1";
+	} else if (ident.find(kCounterNamePrefix) == 0) {
+		/*
+		 * Prevent collision with counters of the loop or
+		 * functions to avoid infinite loops.
+		 */
+		ident = std::string(kDefaultIdent);
 	}
 	/* Identifier has default name, add an index. */
 	if (!ident.compare(kDefaultIdent)) {
