@@ -14,11 +14,19 @@ Synopsis: bit.band(x1 [,x2...])
 local luzer = require("luzer")
 local test_lib = require("lib")
 
+local is_luajit = test_lib.lua_version() == "LuaJIT"
+
 local band
-if test_lib.lua_version() == "LuaJIT" then
+local bor
+local bnot
+if is_luajit then
     band = bit.band
+    bor = bit.bor
+    bnot = bit.bnot
 else
     band = test_lib.bitwise_op("&")
+    bor = test_lib.bitwise_op("|")
+    bnot = test_lib.bitwise_op("~")
 end
 
 local unpack = unpack or table.unpack
@@ -39,6 +47,25 @@ local function TestOneInput(buf)
     assert(band(x, 0) == 0)
     assert(band(x, x) == x)
     assert(band(x, -1) == x)
+
+    -- Distributive law: a & (b | c) = (a & b) | (a & c).
+    assert(band(x, bor(y, z)) == bor(band(x, y), band(x, z)))
+
+    -- Absorption.
+    assert(band(x, bor(x, y)) == x)
+    assert(bor(x, band(x, y)) == x)
+
+    -- De Morgan's laws.
+    assert(bnot(band(x, y)) == bor(bnot(x), bnot(y)))
+    assert(bnot(bor(x, y)) == band(bnot(x), bnot(y)))
+
+    -- Consistency with tobit (LuaJIT only).
+    if is_luajit then
+        -- `band` is assigned in both branches above, so the
+        -- analyzer cannot infer a single function type.
+        ---@diagnostic disable-next-line: param-type-mismatch
+        assert(band(bit.tobit(x), bit.tobit(y)) == bit.tobit(band(x, y)))
+    end
 
     -- Multiple arguments.
     -- `n` must be less than UINT_MAX and there are at least extra
